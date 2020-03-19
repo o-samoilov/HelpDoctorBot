@@ -6,7 +6,6 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-use Http\Adapter\Guzzle6;
 
 class IndexController extends AbstractController
 {
@@ -15,6 +14,17 @@ class IndexController extends AbstractController
      */
     public function index()
     {
-        return $this->json([]);
+        $botKey = '1081850027:AAFJkaQ9C2fpI1JA7cRghxaY-uSPJQsXqho';
+
+        $client         = new \Http\Adapter\Guzzle6\Client();
+        $requestFactory = new \Http\Factory\Guzzle\RequestFactory();
+        $streamFactory  = new \Http\Factory\Guzzle\StreamFactory();
+
+        $apiClient = new \TgBotApi\BotApiBase\ApiClient($requestFactory, $streamFactory, $client);
+        $bot       = new \TgBotApi\BotApiBase\BotApi($botKey, $apiClient, new \TgBotApi\BotApiBase\BotApiNormalizer());
+
+        $updates = $bot->getUpdates(\TgBotApi\BotApiBase\Method\GetUpdatesMethod::create());
+
+        return $this->json($updates);
     }
 }
