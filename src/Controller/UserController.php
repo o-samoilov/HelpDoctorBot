@@ -91,11 +91,24 @@ class UserController extends AbstractController
             return $this->createErrorResponse('Input data error.');
         }
 
+        //todo
+        if (!isset($data['city_id']) || !is_int($data['city_id'])) {
+            return $this->createErrorResponse('Input data error.');
+        }
+
         $user = $userRepository->findByPipeUid($data['pipe_uid']);
         if ($user !== null) {
             return $this->json([
                 'status' => 'ok',
-                'data'   => [],
+                'data'   => [
+                    'pipe_uid'     => $user->getPipeUid(),
+                    'telegram_uid' => $user->getTelegramUid(),
+                    'username'     => $user->getUsername(),
+                    'first_name'   => $user->getFirstName(),
+                    'last_name'    => $user->getLastName(),
+                    'role'         => $user->getRole(),
+                    'description'  => $user->getDescription(),
+                ],
             ]);
         }
 
@@ -123,7 +136,15 @@ class UserController extends AbstractController
 
         return $this->json([
             'status' => 'ok',
-            'data'   => [],
+            'data'   => [
+                'pipe_uid'     => $user->getPipeUid(),
+                'telegram_uid' => $user->getTelegramUid(),
+                'username'     => $user->getUsername(),
+                'first_name'   => $user->getFirstName(),
+                'last_name'    => $user->getLastName(),
+                'role'         => $user->getRole(),
+                'description'  => $user->getDescription(),
+            ],
         ]);
     }
 
