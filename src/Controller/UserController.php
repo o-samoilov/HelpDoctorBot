@@ -24,11 +24,67 @@ class UserController extends AbstractController
         $request = Request::createFromGlobals();
         $data    = json_decode($request->getContent(), true);
 
-        if (!isset($data['uid']) || !is_int($data['uid'])) {
-            return $this->createErrorResponse('Помилка вхідних данних.');
+        if (!isset($data['pipe_uid']) || !is_int($data['pipe_uid'])) {
+            return $this->createErrorResponse('Input data error.');
         }
 
-        $user = $userRepository->findByUid(123);
+        if (!isset($data['telegram_uid']) || !is_int($data['telegram_uid'])) {
+            return $this->createErrorResponse('Input data error.');
+        }
+
+        if (!isset($data['username']) || !is_string($data['username'])) {
+            return $this->createErrorResponse('Input data error.');
+        }
+
+        if (!isset($data['first_name']) || !is_string($data['first_name'])) {
+            return $this->createErrorResponse('Input data error.');
+        }
+
+        if (!isset($data['last_name']) || !is_string($data['last_name'])) {
+            return $this->createErrorResponse('Input data error.');
+        }
+
+        if (!isset($data['description']) || !is_string($data['description'])) {
+            return $this->createErrorResponse('Input data error.');
+        }
+
+        if (!isset($data['role']) || !in_array($data['role'], [
+                \App\Entity\User::ROLE_DRIVER,
+                \App\Entity\User::ROLE_DOCTOR,
+            ])
+        ) {
+            return $this->createErrorResponse('Input data error.');
+        }
+
+        $user = $userRepository->findByPipeUid($data['pipe_uid']);
+        if ($user !== null) {
+            return $this->json([
+                'status' => 'ok',
+                'data'   => [],
+            ]);
+        }
+
+        if ($data['role'] === \App\Entity\User::ROLE_DRIVER) {
+            $user = $userFactory->createDriver(
+                $data['pipe_uid'],
+                $data['telegram_uid'],
+                $data['username'],
+                $data['first_name'],
+                $data['last_name'],
+                $data['description']
+            );
+        } else {
+            $user = $userFactory->createDoctor(
+                $data['pipe_uid'],
+                $data['telegram_uid'],
+                $data['username'],
+                $data['first_name'],
+                $data['last_name'],
+                $data['description']
+            );
+        }
+
+        $userRepository->save($user);
 
         return $this->json([
             'status' => 'ok',

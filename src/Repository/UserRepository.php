@@ -21,9 +21,18 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
-    public function findByUid(int $uid): ?User
+    // ########################################
+
+    public function findByPipeUid(int $pipeUid): ?User
     {
-        return $this->findOneBy(['uid' => $uid]);
+        return $this->findOneBy(['pipeUid' => $pipeUid]);
+    }
+
+    public function save(User $user): void
+    {
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($user);
+        $entityManager->flush();
     }
 
     // ########################################
