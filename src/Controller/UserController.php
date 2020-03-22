@@ -11,13 +11,48 @@ class UserController extends AbstractController
     // ########################################
 
     /**
+     * @Route("/user/get", methods={"GET"})
+     * @param \App\Repository\UserRepository $userRepository
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function getAction(
+        \App\Repository\UserRepository $userRepository
+    ): \Symfony\Component\HttpFoundation\JsonResponse {
+        $request = Request::createFromGlobals();
+        $pipeUid = $request->get('pipe_uid');
+
+        if ($pipeUid === null) {
+            return $this->createErrorResponse('Input data error.');
+        }
+
+        $user = $userRepository->findByPipeUid((int)$pipeUid);
+        if ($user !== null) {
+            return $this->json([
+                'status' => 'ok',
+                'data'   => [
+                    'pipe_uid'     => $user->getPipeUid(),
+                    'telegram_uid' => $user->getTelegramUid(),
+                    'username'     => $user->getUsername(),
+                    'first_name'   => $user->getFirstName(),
+                    'last_name'    => $user->getLastName(),
+                    'role'         => $user->getRole(),
+                    'description'  => $user->getDescription(),
+                ],
+            ]);
+        }
+
+        return $this->createErrorResponse('Not found');
+    }
+
+    /**
      * @Route("/user/create", methods={"POST"})
      * @param \App\Entity\User\Factory       $userFactory
      * @param \App\Repository\UserRepository $userRepository
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function create(
+    public function createAction(
         \App\Entity\User\Factory $userFactory,
         \App\Repository\UserRepository $userRepository
     ): \Symfony\Component\HttpFoundation\JsonResponse {

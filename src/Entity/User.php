@@ -94,6 +94,11 @@ class User
         return $this->lastName;
     }
 
+    public function getRole(): int
+    {
+        return $this->role;
+    }
+
     public function isRoleDriver(): bool
     {
         return $this->role === self::ROLE_DRIVER;
