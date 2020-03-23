@@ -49,12 +49,14 @@ class UserController extends AbstractController
      * @Route("/user/create", methods={"POST"})
      * @param \App\Entity\User\Factory       $userFactory
      * @param \App\Repository\UserRepository $userRepository
+     * @param \App\Repository\CityRepository $cityRepository
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function createAction(
         \App\Entity\User\Factory $userFactory,
-        \App\Repository\UserRepository $userRepository
+        \App\Repository\UserRepository $userRepository,
+        \App\Repository\CityRepository $cityRepository
     ): \Symfony\Component\HttpFoundation\JsonResponse {
         $request = Request::createFromGlobals();
         $data    = json_decode($request->getContent(), true);
@@ -91,8 +93,12 @@ class UserController extends AbstractController
             return $this->createErrorResponse('Input data error.');
         }
 
-        //todo
         if (!isset($data['city_id']) || !is_int($data['city_id'])) {
+            return $this->createErrorResponse('Input data error.');
+        }
+
+        $city = $cityRepository->find($data['city_id']);
+        if ($city === null) {
             return $this->createErrorResponse('Input data error.');
         }
 
@@ -119,7 +125,8 @@ class UserController extends AbstractController
                 $data['username'],
                 $data['first_name'],
                 $data['last_name'],
-                $data['description']
+                $data['description'],
+                $city
             );
         } else {
             $user = $userFactory->createDoctor(
@@ -128,7 +135,8 @@ class UserController extends AbstractController
                 $data['username'],
                 $data['first_name'],
                 $data['last_name'],
-                $data['description']
+                $data['description'],
+                $city
             );
         }
 

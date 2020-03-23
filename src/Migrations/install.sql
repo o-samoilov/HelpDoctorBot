@@ -8,9 +8,11 @@ CREATE TABLE user
     last_name    VARCHAR(255)       NOT NULL,
     role         INT                NOT NULL,
     description  VARCHAR(255) DEFAULT NULL,
+    city_id      INT                NOT NULL,
     UNIQUE INDEX UNIQ_8D93D649B21872D3 (pipe_uid),
     UNIQUE INDEX UNIQ_8D93D6499C52A1C8 (telegram_uid),
     UNIQUE INDEX UNIQ_8D93D649F85E0677 (username),
+    CONSTRAINT FK_8D93D6498BAC62AF FOREIGN KEY (city_id) REFERENCES city (id),
     PRIMARY KEY (id)
 ) DEFAULT CHARACTER SET utf8mb4
   COLLATE `utf8mb4_unicode_ci`

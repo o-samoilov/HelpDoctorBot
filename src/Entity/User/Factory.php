@@ -14,7 +14,8 @@ class Factory
         string $username,
         string $firstName,
         string $lastName,
-        string $description
+        string $description,
+        \App\Entity\City $city
     ): \App\Entity\User {
         return new \App\Entity\User(
             $pipeUid,
@@ -23,7 +24,8 @@ class Factory
             $firstName,
             $lastName,
             \App\Entity\User::ROLE_DRIVER,
-            $description
+            $description,
+            $city
         );
     }
 
@@ -35,7 +37,8 @@ class Factory
         string $username,
         string $firstName,
         string $lastName,
-        string $description
+        string $description,
+        \App\Entity\City $city
     ): \App\Entity\User {
         return new \App\Entity\User(
             $pipeUid,
@@ -44,7 +47,8 @@ class Factory
             $firstName,
             $lastName,
             \App\Entity\User::ROLE_DOCTOR,
-            $description
+            $description,
+            $city
         );
     }
 

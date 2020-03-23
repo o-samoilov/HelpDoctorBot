@@ -42,6 +42,13 @@ class User
     /** @ORM\Column(type="string", name="description", nullable=true) */
     protected $description;
 
+    /**
+     * @var \App\Entity\City
+     * @ORM\OneToOne(targetEntity="App\Entity\City")
+     * @ORM\JoinColumn(name="city_id", referencedColumnName="id", nullable=false)
+     */
+    protected $city;
+
     // ########################################
 
     public function __construct(
@@ -51,7 +58,8 @@ class User
         string $firstName,
         string $lastName,
         int $role,
-        string $description
+        string $description,
+        City $city
     ) {
         $this->pipeUid     = $pipeUid;
         $this->telegramUid = $telegramUid;
@@ -60,6 +68,7 @@ class User
         $this->lastName    = $lastName;
         $this->role        = $role;
         $this->description = $description;
+        $this->city        = $city;
     }
 
     // ########################################
