@@ -55,14 +55,14 @@ class UserController extends AbstractController
         \App\Repository\CityRepository $cityRepository
     ): \Symfony\Component\HttpFoundation\JsonResponse {
         $request = Request::createFromGlobals();
-        $data    = json_decode($request->getContent(), true);
+        $data    = (array)json_decode($request->getContent(), true);
 
         if (!isset($data['pipe_uid']) || !is_int($data['pipe_uid'])) {
-            return $this->createErrorResponse('Input data error.');
+            return $this->createErrorResponse('Invalid key "pipe_uid".');
         }
 
         if (!isset($data['description']) || !is_string($data['description'])) {
-            return $this->createErrorResponse('Input data error.');
+            return $this->createErrorResponse('Invalid key "description".');
         }
 
         if (!isset($data['role']) || !in_array($data['role'], [
@@ -70,16 +70,16 @@ class UserController extends AbstractController
                 \App\Entity\User::ROLE_DOCTOR,
             ])
         ) {
-            return $this->createErrorResponse('Input data error.');
+            return $this->createErrorResponse('Invalid key "role".');
         }
 
         if (!isset($data['city_id']) || !is_int($data['city_id'])) {
-            return $this->createErrorResponse('Input data error.');
+            return $this->createErrorResponse('Invalid key "city_id".');
         }
 
         $city = $cityRepository->find($data['city_id']);
         if ($city === null) {
-            return $this->createErrorResponse('Input data error.');
+            return $this->createErrorResponse('Invalid key "city_id".');
         }
 
         $user = $userRepository->findByPipeUid($data['pipe_uid']);
