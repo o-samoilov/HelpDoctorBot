@@ -24,18 +24,6 @@ class User
     /** @ORM\Column(type="integer", name="pipe_uid", unique=true, nullable=false) */
     protected $pipeUid;
 
-    /** @ORM\Column(type="integer", name="telegram_uid", unique=true, nullable=false) */
-    protected $telegramUid;
-
-    /** @ORM\Column(type="string", length=130, name="username", unique=true, nullable=false) */
-    protected $username;
-
-    /** @ORM\Column(type="string", length=255, name="first_name", nullable=false) */
-    protected $firstName;
-
-    /** @ORM\Column(type="string", length=255, name="last_name", nullable=false) */
-    protected $lastName;
-
     /** @ORM\Column(type="integer", name="role", nullable=false) */
     protected $role;
 
@@ -53,19 +41,11 @@ class User
 
     public function __construct(
         int $pipeUid,
-        int $telegramUid,
-        string $username,
-        string $firstName,
-        string $lastName,
         int $role,
         string $description,
         City $city
     ) {
         $this->pipeUid     = $pipeUid;
-        $this->telegramUid = $telegramUid;
-        $this->username    = $username;
-        $this->firstName   = $firstName;
-        $this->lastName    = $lastName;
         $this->role        = $role;
         $this->description = $description;
         $this->city        = $city;
@@ -81,26 +61,6 @@ class User
     public function getPipeUid(): int
     {
         return $this->pipeUid;
-    }
-
-    public function getTelegramUid(): int
-    {
-        return $this->telegramUid;
-    }
-
-    public function getUsername(): string
-    {
-        return $this->username;
-    }
-
-    public function getFirstName(): string
-    {
-        return $this->firstName;
-    }
-
-    public function getLastName(): string
-    {
-        return $this->lastName;
     }
 
     public function getRole(): int

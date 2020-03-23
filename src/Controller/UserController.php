@@ -31,13 +31,9 @@ class UserController extends AbstractController
             return $this->json([
                 'status' => 'ok',
                 'data'   => [
-                    'pipe_uid'     => $user->getPipeUid(),
-                    'telegram_uid' => $user->getTelegramUid(),
-                    'username'     => $user->getUsername(),
-                    'first_name'   => $user->getFirstName(),
-                    'last_name'    => $user->getLastName(),
-                    'role'         => $user->getRole(),
-                    'description'  => $user->getDescription(),
+                    'pipe_uid'    => $user->getPipeUid(),
+                    'role'        => $user->getRole(),
+                    'description' => $user->getDescription(),
                 ],
             ]);
         }
@@ -62,22 +58,6 @@ class UserController extends AbstractController
         $data    = json_decode($request->getContent(), true);
 
         if (!isset($data['pipe_uid']) || !is_int($data['pipe_uid'])) {
-            return $this->createErrorResponse('Input data error.');
-        }
-
-        if (!isset($data['telegram_uid']) || !is_int($data['telegram_uid'])) {
-            return $this->createErrorResponse('Input data error.');
-        }
-
-        if (!isset($data['username']) || !is_string($data['username'])) {
-            return $this->createErrorResponse('Input data error.');
-        }
-
-        if (!isset($data['first_name']) || !is_string($data['first_name'])) {
-            return $this->createErrorResponse('Input data error.');
-        }
-
-        if (!isset($data['last_name']) || !is_string($data['last_name'])) {
             return $this->createErrorResponse('Input data error.');
         }
 
@@ -107,13 +87,9 @@ class UserController extends AbstractController
             return $this->json([
                 'status' => 'ok',
                 'data'   => [
-                    'pipe_uid'     => $user->getPipeUid(),
-                    'telegram_uid' => $user->getTelegramUid(),
-                    'username'     => $user->getUsername(),
-                    'first_name'   => $user->getFirstName(),
-                    'last_name'    => $user->getLastName(),
-                    'role'         => $user->getRole(),
-                    'description'  => $user->getDescription(),
+                    'pipe_uid'    => $user->getPipeUid(),
+                    'role'        => $user->getRole(),
+                    'description' => $user->getDescription(),
                 ],
             ]);
         }
@@ -121,20 +97,12 @@ class UserController extends AbstractController
         if ($data['role'] === \App\Entity\User::ROLE_DRIVER) {
             $user = $userFactory->createDriver(
                 $data['pipe_uid'],
-                $data['telegram_uid'],
-                $data['username'],
-                $data['first_name'],
-                $data['last_name'],
                 $data['description'],
                 $city
             );
         } else {
             $user = $userFactory->createDoctor(
                 $data['pipe_uid'],
-                $data['telegram_uid'],
-                $data['username'],
-                $data['first_name'],
-                $data['last_name'],
                 $data['description'],
                 $city
             );
@@ -145,13 +113,9 @@ class UserController extends AbstractController
         return $this->json([
             'status' => 'ok',
             'data'   => [
-                'pipe_uid'     => $user->getPipeUid(),
-                'telegram_uid' => $user->getTelegramUid(),
-                'username'     => $user->getUsername(),
-                'first_name'   => $user->getFirstName(),
-                'last_name'    => $user->getLastName(),
-                'role'         => $user->getRole(),
-                'description'  => $user->getDescription(),
+                'pipe_uid'    => $user->getPipeUid(),
+                'role'        => $user->getRole(),
+                'description' => $user->getDescription(),
             ],
         ]);
     }
