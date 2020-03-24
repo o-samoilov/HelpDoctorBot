@@ -29,11 +29,11 @@ class RouteController extends AbstractController
         $request = Request::createFromGlobals();
         $data    = (array)json_decode($request->getContent(), true);
 
-        if (!isset($data['user_id']) || !is_int($data['user_id'])) {
-            return $this->createErrorResponse('Invalid key "user_id".');
+        if (!isset($data['pipe_uid']) || !is_int($data['pipe_uid'])) {
+            return $this->createErrorResponse('Invalid key "pipe_uid".');
         }
 
-        $user = $userRepository->find($data['user_id']);
+        $user = $userRepository->findByPipeUid($data['pipe_uid']);
         if ($user === null) {
             return $this->createErrorResponse('User not found.');
         }
