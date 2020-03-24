@@ -37,6 +37,7 @@ class UserController extends AbstractController
                 'pipe_uid'    => $user->getPipeUid(),
                 'role'        => $user->getRole(),
                 'description' => $user->getDescription(),
+                'city_id'     => $user->getCity()->getId(),
             ],
         ]);
     }
