@@ -43,14 +43,12 @@ class UserController extends AbstractController
 
     /**
      * @Route("/user/create", methods={"POST"})
-     * @param \App\Entity\User\Factory       $userFactory
      * @param \App\Repository\UserRepository $userRepository
      * @param \App\Repository\CityRepository $cityRepository
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function createAction(
-        \App\Entity\User\Factory $userFactory,
         \App\Repository\UserRepository $userRepository,
         \App\Repository\CityRepository $cityRepository
     ): \Symfony\Component\HttpFoundation\JsonResponse {
@@ -84,28 +82,22 @@ class UserController extends AbstractController
 
         $user = $userRepository->findByPipeUid($data['pipe_uid']);
         if ($user !== null) {
-            return $this->json([
-                'status' => 'ok',
-                'data'   => [
-                    'pipe_uid'    => $user->getPipeUid(),
-                    'role'        => $user->getRole(),
-                    'description' => $user->getDescription(),
-                ],
-            ]);
+            return $this->createErrorResponse('User already exist.');
         }
 
-        if ($data['role'] === \App\Entity\User::ROLE_DRIVER) {
-            $user = $userFactory->createDriver(
-                $data['pipe_uid'],
-                $data['description'],
-                $city
-            );
+        $pipeUid     = $data['pipe_uid'];
+        $description = $data['description'];
+        $role        = $data['role'];
+
+        $user = new \App\Entity\User();
+        $user->setPipeUid($pipeUid)
+             ->setDescription($description)
+             ->setCity($city);
+
+        if ($role === \App\Entity\User::ROLE_DRIVER) {
+            $user->markRoleDriver();
         } else {
-            $user = $userFactory->createDoctor(
-                $data['pipe_uid'],
-                $data['description'],
-                $city
-            );
+            $user->markRoleDoctor();
         }
 
         $userRepository->save($user);
@@ -116,6 +108,7 @@ class UserController extends AbstractController
                 'pipe_uid'    => $user->getPipeUid(),
                 'role'        => $user->getRole(),
                 'description' => $user->getDescription(),
+                'city_id'     => $user->getCity()->getId(),
             ],
         ]);
     }

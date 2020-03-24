@@ -14,37 +14,19 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  */
 class RouteRepository extends ServiceEntityRepository
 {
+    // ########################################
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Route::class);
     }
 
-    // /**
-    //  * @return Route[] Returns an array of Route objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function save(Route $route): void
     {
-        return $this->createQueryBuilder('r')
-            ->andWhere('r.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('r.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($route);
+        $entityManager->flush();
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?Route
-    {
-        return $this->createQueryBuilder('r')
-            ->andWhere('r.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
+    // ########################################
 }

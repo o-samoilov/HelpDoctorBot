@@ -19,7 +19,7 @@ class City
      */
     private $id;
 
-    /** @ORM\Column(type="string", length=160, name="name", unique=true, nullable=false) */
+    /** @ORM\Column(type="string", length=255, name="name", nullable=false) */
     protected $name;
 
     // ########################################

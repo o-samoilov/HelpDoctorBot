@@ -14,37 +14,22 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  */
 class DistrictRepository extends ServiceEntityRepository
 {
+    // ########################################
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, District::class);
     }
 
-    // /**
-    //  * @return District[] Returns an array of District objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('d')
-            ->andWhere('d.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('d.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+    // ########################################
 
-    /*
-    public function findOneBySomeField($value): ?District
+    public function findByIdAndCity(int $id, \App\Entity\City $city): District
     {
-        return $this->createQueryBuilder('d')
-            ->andWhere('d.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        return $this->findOneBy([
+            'id'   => $id,
+            'city' => $city->getId(),
+        ]);
     }
-    */
+
+    // ########################################
 }

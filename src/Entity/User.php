@@ -34,23 +34,9 @@ class User
     /**
      * @var \App\Entity\City
      * @ORM\OneToOne(targetEntity="App\Entity\City")
-     * @ORM\JoinColumn(name="city_id", referencedColumnName="id", nullable=false)
+     * @ORM\ManyToOne(name="city_id", referencedColumnName="id", nullable=false)
      */
     protected $city;
-
-    // ########################################
-
-    public function __construct(
-        int $pipeUid,
-        int $role,
-        string $description,
-        City $city
-    ) {
-        $this->pipeUid     = $pipeUid;
-        $this->role        = $role;
-        $this->description = $description;
-        $this->city        = $city;
-    }
 
     // ########################################
 
@@ -59,10 +45,21 @@ class User
         return $this->id;
     }
 
+    // ########################################
+
     public function getPipeUid(): int
     {
         return $this->pipeUid;
     }
+
+    public function setPipeUid($pipeUid): self
+    {
+        $this->pipeUid = $pipeUid;
+
+        return $this;
+    }
+
+    // ########################################
 
     public function getRole(): int
     {
@@ -79,9 +76,46 @@ class User
         return $this->role === self::ROLE_DOCTOR;
     }
 
+    public function markRoleDriver(): self
+    {
+        $this->role = self::ROLE_DRIVER;
+
+        return $this;
+    }
+
+    public function markRoleDoctor(): self
+    {
+        $this->role = self::ROLE_DOCTOR;
+
+        return $this;
+    }
+
+    // ########################################
+
     public function getDescription(): string
     {
         return $this->description;
+    }
+
+    public function setDescription($description): self
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    // ########################################
+
+    public function getCity(): \App\Entity\City
+    {
+        return $this->city;
+    }
+
+    public function setCity(\App\Entity\City $city): self
+    {
+        $this->city = $city;
+
+        return $this;
     }
 
     // ########################################
