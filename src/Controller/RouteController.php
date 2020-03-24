@@ -111,6 +111,54 @@ class RouteController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/route/find",  methods={"GET"})
+     *
+     * @param \App\Repository\RouteRepository $routeRepository
+     * @param \App\Repository\UserRepository  $userRepository
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function findAction(
+        \App\Repository\RouteRepository $routeRepository,
+        \App\Repository\UserRepository $userRepository
+    ): \Symfony\Component\HttpFoundation\JsonResponse {
+        $request = Request::createFromGlobals();
+        $pipeUid = $request->get('pipe_uid');
+
+        if ($pipeUid === null) {
+            return $this->createErrorResponse('Input data error.');
+        }
+
+        $user = $userRepository->findByPipeUid((int)$pipeUid);
+        if ($user === null) {
+            return $this->createErrorResponse('User not found');
+        }
+
+        $routes = $routeRepository->findBy([
+            'user' => $user,
+        ]);
+
+        $data = [];
+        foreach ($routes as $route) {
+            $data[] = [
+                'id'            => $route->getId(),
+                'from_district' => $route->getFromDistrict()->getName(),
+                'from_comment'  => $route->getFromComment(),
+                'to_district'   => $route->getToDistrict()->getName(),
+                'to_comment'    => $route->getToComment(),
+                'time'          => $route->getTime(),
+                'date'          => $route->getDate(),
+                'city'          => $route->getCity()->getName(),
+            ];
+        }
+
+        return $this->json([
+            'status' => 'ok',
+            'data'   => $data,
+        ]);
+    }
+
     // ----------------------------------------
 
     private function createErrorResponse(string $message): \Symfony\Component\HttpFoundation\JsonResponse

@@ -27,18 +27,18 @@ class UserController extends AbstractController
         }
 
         $user = $userRepository->findByPipeUid((int)$pipeUid);
-        if ($user !== null) {
-            return $this->json([
-                'status' => 'ok',
-                'data'   => [
-                    'pipe_uid'    => $user->getPipeUid(),
-                    'role'        => $user->getRole(),
-                    'description' => $user->getDescription(),
-                ],
-            ]);
+        if ($user === null) {
+            return $this->createErrorResponse('User not found');
         }
 
-        return $this->createErrorResponse('Not found');
+        return $this->json([
+            'status' => 'ok',
+            'data'   => [
+                'pipe_uid'    => $user->getPipeUid(),
+                'role'        => $user->getRole(),
+                'description' => $user->getDescription(),
+            ],
+        ]);
     }
 
     /**
