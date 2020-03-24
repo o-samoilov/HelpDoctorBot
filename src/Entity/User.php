@@ -33,8 +33,8 @@ class User
 
     /**
      * @var \App\Entity\City
-     * @ORM\OneToOne(targetEntity="App\Entity\City")
-     * @ORM\ManyToOne(name="city_id", referencedColumnName="id", nullable=false)
+     * @ORM\ManyToOne(targetEntity="App\Entity\City")
+     * @ORM\JoinColumn(name="city_id", referencedColumnName="id", nullable=false)
      */
     protected $city;
 

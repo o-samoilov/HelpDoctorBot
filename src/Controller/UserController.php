@@ -55,7 +55,7 @@ class UserController extends AbstractController
         $request = Request::createFromGlobals();
         $data    = (array)json_decode($request->getContent(), true);
 
-        if (!isset($Rta['pipe_uid']) || !is_int($data['pipe_uid'])) {
+        if (!isset($data['pipe_uid']) || !is_int($data['pipe_uid'])) {
             return $this->createErrorResponse('Invalid key "pipe_uid".');
         }
 

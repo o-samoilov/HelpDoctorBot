@@ -1,3 +1,70 @@
+DROP TABLE IF EXISTS city;
+CREATE TABLE city
+(
+    id   INT AUTO_INCREMENT NOT NULL,
+    name VARCHAR(255)       NOT NULL,
+    PRIMARY KEY (id)
+) DEFAULT CHARACTER SET utf8mb4
+  COLLATE `utf8mb4_unicode_ci`
+  ENGINE = InnoDB;
+
+DROP TABLE IF EXISTS district;
+CREATE TABLE district
+(
+    id      INT(11)      NOT NULL AUTO_INCREMENT,
+    city_id INT(11)      NOT NULL,
+    name    VARCHAR(160) NOT NULL,
+    INDEX IDX_31C154878BAC62AF (city_id),
+    CONSTRAINT FK_31C154878BAC62AF FOREIGN KEY (city_id) REFERENCES city (id),
+    PRIMARY KEY (id)
+)
+    ENGINE = INNODB,
+    CHARACTER SET utf8mb4,
+    COLLATE utf8mb4_unicode_ci;
+
+DROP TABLE IF EXISTS route;
+CREATE TABLE route
+(
+    id            INT(11)      NOT NULL AUTO_INCREMENT,
+    from_district INT(11)      NOT NULL,
+    to_district   INT(11)      NOT NULL,
+    city_id       INT(11)      NOT NULL,
+    user_id       INT(11)      NOT NULL,
+    from_comment  VARCHAR(255) DEFAULT NULL,
+    to_comment    VARCHAR(255) DEFAULT NULL,
+    time          VARCHAR(255) NOT NULL,
+    date          VARCHAR(255) NOT NULL,
+    INDEX IDX_2C42079772EB41D (from_district),
+    INDEX IDX_2C420798BAC62AF (city_id),
+    INDEX IDX_2C42079A76ED395 (user_id),
+    INDEX IDX_2C42079FC98CA29 (to_district),
+    CONSTRAINT FK_2C42079772EB41D FOREIGN KEY (from_district) REFERENCES district (id),
+    CONSTRAINT FK_2C420798BAC62AF FOREIGN KEY (city_id) REFERENCES city (id),
+    CONSTRAINT FK_2C42079A76ED395 FOREIGN KEY (user_id) REFERENCES user (id),
+    CONSTRAINT FK_2C42079FC98CA29 FOREIGN KEY (to_district) REFERENCES district (id),
+    PRIMARY KEY (id)
+)
+    ENGINE = INNODB,
+    CHARACTER SET utf8mb4,
+    COLLATE utf8mb4_unicode_ci;
+
+DROP TABLE IF EXISTS user;
+CREATE TABLE user
+(
+    id          INT AUTO_INCREMENT NOT NULL,
+    pipe_uid    INT                NOT NULL,
+    role        INT                NOT NULL,
+    description VARCHAR(255) DEFAULT NULL,
+    city_id     INT                NOT NULL,
+    UNIQUE INDEX UNIQ_8D93D649B21872D3 (pipe_uid),
+    CONSTRAINT FK_8D93D6498BAC62AF FOREIGN KEY (city_id) REFERENCES city (id),
+    PRIMARY KEY (id)
+) DEFAULT CHARACTER SET utf8mb4
+  COLLATE `utf8mb4_unicode_ci`
+  ENGINE = InnoDB;
+
+
+########################################################
 
 INSERT INTO city (id, name) VALUES (1, 'Київ');
 INSERT INTO city (id, name) VALUES (2, 'Дніпро');

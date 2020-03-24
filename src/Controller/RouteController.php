@@ -51,9 +51,14 @@ class RouteController extends AbstractController
             return $this->createErrorResponse('City not found.');
         }
 
+        if ($user->getCity()->getId() !== $city->getId()) {
+            return $this->createErrorResponse('Invalid city, user has another city.');
+        }
+
         if (!isset($data['from_district_id']) || !is_int($data['from_district_id'])) {
             return $this->createErrorResponse('Invalid key "from_district_id".');
         }
+
         $fromDistrict = $districtRepository->findByIdAndCity($data['from_district_id'], $city);
         if ($fromDistrict === null) {
             return $this->createErrorResponse('From district not found.');
@@ -94,7 +99,9 @@ class RouteController extends AbstractController
               ->setToDistrict($toDistrict)
               ->setToComment($commentTo)
               ->setTime($time)
-              ->setDate($date);
+              ->setDate($date)
+              ->setCity($city)
+              ->setUser($user);
 
         $routeRepository->save($route);
 

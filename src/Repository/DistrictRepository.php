@@ -23,11 +23,11 @@ class DistrictRepository extends ServiceEntityRepository
 
     // ########################################
 
-    public function findByIdAndCity(int $id, \App\Entity\City $city): District
+    public function findByIdAndCity(int $id, \App\Entity\City $city): ?District
     {
         return $this->findOneBy([
             'id'   => $id,
-            'city' => $city->getId(),
+            'city' => $city,
         ]);
     }
 

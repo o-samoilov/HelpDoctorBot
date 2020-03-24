@@ -60,9 +60,16 @@ class Route
     /**
      * @var \App\Entity\City
      * @ORM\ManyToOne(targetEntity="App\Entity\City")
-     * @ORM\JoinColumn(name="city", referencedColumnName="id", nullable=false)
+     * @ORM\JoinColumn(name="city_id", referencedColumnName="id", nullable=false)
      */
     protected $city;
+
+    /**
+     * @var \App\Entity\User
+     * @ORM\ManyToOne(targetEntity="App\Entity\User")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+     */
+    protected $user;
 
     // ########################################
 
@@ -171,6 +178,20 @@ class Route
     public function setCity(\App\Entity\City $city): self
     {
         $this->city = $city;
+
+        return $this;
+    }
+
+    // ########################################
+
+    public function getUser(): \App\Entity\User
+    {
+        return $this->user;
+    }
+
+    public function setUser(\App\Entity\User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }
