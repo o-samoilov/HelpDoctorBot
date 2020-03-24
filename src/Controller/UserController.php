@@ -57,7 +57,7 @@ class UserController extends AbstractController
         $request = Request::createFromGlobals();
         $data    = (array)json_decode($request->getContent(), true);
 
-        if (!isset($data['pipe_uid']) || !is_int($data['pipe_uid'])) {
+        if (!isset($Rta['pipe_uid']) || !is_int($data['pipe_uid'])) {
             return $this->createErrorResponse('Invalid key "pipe_uid".');
         }
 
@@ -79,7 +79,7 @@ class UserController extends AbstractController
 
         $city = $cityRepository->find($data['city_id']);
         if ($city === null) {
-            return $this->createErrorResponse('Invalid key "city_id".');
+            return $this->createErrorResponse('City not found.');
         }
 
         $user = $userRepository->findByPipeUid($data['pipe_uid']);
