@@ -35,25 +35,26 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
 
     public function getCredentials(Request $request)
     {
+        $authToken = null;
         if ($request->headers->has('X-AUTH-TOKEN')) {
-            return $request->headers->get('X-AUTH-TOKEN');
+            $authToken = $request->headers->get('X-AUTH-TOKEN');
         }
 
         if ($request->headers->has('HTTP-X-AUTH-TOKEN')) {
-            return $request->headers->get('HTTP-X-AUTH-TOKEN');
+            $authToken = $request->headers->get('HTTP-X-AUTH-TOKEN');
         }
 
-        return '';
+        return ['auth_token' => $authToken];
     }
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        if (null === $credentials || empty($credentials)) {
+        if (null === $credentials['auth_token']) {
             return null;
         }
 
         return $this->em->getRepository(AccessToken::class)
-                        ->findOneBy(['token' => $credentials]);
+                        ->findOneBy(['token' => $credentials['auth_token']]);
     }
 
     public function checkCredentials($credentials, UserInterface $user)
@@ -82,7 +83,7 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
     public function start(Request $request, AuthenticationException $authException = null)
     {
         $data = [
-            'message' => 'Authentication Required'
+            'message' => 'Authentication Required',
         ];
 
         return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
@@ -91,6 +92,11 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
     public function supportsRememberMe()
     {
         return false;
+    }
+
+    public function getMessageKey()
+    {
+        return 'Username could not be found.';
     }
 
     // ########################################

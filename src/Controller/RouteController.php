@@ -116,12 +116,14 @@ class RouteController extends AbstractController
      *
      * @param \App\Repository\RouteRepository $routeRepository
      * @param \App\Repository\UserRepository  $userRepository
+     * @param \App\Model\Pipe\SendMessage     $pipeSendMessage
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function findAction(
         \App\Repository\RouteRepository $routeRepository,
-        \App\Repository\UserRepository $userRepository
+        \App\Repository\UserRepository $userRepository,
+        \App\Model\Pipe\SendMessage $pipeSendMessage
     ): \Symfony\Component\HttpFoundation\JsonResponse {
         $request = Request::createFromGlobals();
         $pipeUid = $request->get('pipe_uid');
