@@ -112,7 +112,7 @@ class RouteController extends AbstractController
     }
 
     /**
-     * @Route("/route/find",  methods={"GET"})
+     * @Route("/route/find",  methods={"POST"})
      *
      * @param \App\Repository\RouteRepository $routeRepository
      * @param \App\Repository\UserRepository  $userRepository
@@ -120,7 +120,7 @@ class RouteController extends AbstractController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function findAction(
+    public function sendAction(
         \App\Repository\RouteRepository $routeRepository,
         \App\Repository\UserRepository $userRepository,
         \App\Model\Pipe\SendMessage $pipeSendMessage
@@ -141,23 +141,28 @@ class RouteController extends AbstractController
             'user' => $user,
         ]);
 
-        $data = [];
+        $pipeSendMessage->setUid($user->getPipeUid());
+
         foreach ($routes as $route) {
-            $data[] = [
-                'id'            => $route->getId(),
-                'from_district' => $route->getFromDistrict()->getName(),
-                'from_comment'  => $route->getFromComment(),
-                'to_district'   => $route->getToDistrict()->getName(),
-                'to_comment'    => $route->getToComment(),
-                'time'          => $route->getTime(),
-                'date'          => $route->getDate(),
-                'city'          => $route->getCity()->getName(),
-            ];
+            $pipeSendMessage->setMessage(<<<TEXT
+▶️Із району: {$route->getFromDistrict()->getName()}
+📋Комментарій: {$route->getFromComment()}
+
+▶️До району: {$route->getToDistrict()->getName()}
+📋Комментарій: {$route->getToComment()}
+
+🕔Час: {$route->getTime()}
+📅Дата: {$route->getDate()}
+
+Видалити маршрут: /delete_route_{$route->getId()}
+TEXT
+            );
+
+            $pipeSendMessage->process();
         }
 
         return $this->json([
             'status' => 'ok',
-            'data'   => $data,
         ]);
     }
 

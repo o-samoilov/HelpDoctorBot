@@ -30,6 +30,10 @@ abstract class BaseAbstract
     public function process(): void
     {
         $response = $this->curlProcessor->processPost($this->getUrl(), $this->getData());
+
+        if ($response['status'] !== 'ok') {
+            //todo log
+        }
     }
 
     // ########################################

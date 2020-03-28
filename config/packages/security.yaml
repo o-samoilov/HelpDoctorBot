@@ -1,7 +1,15 @@
 security:
+    encoders:
+        App\Entity\AccessToken:
+            algorithm: auto
+
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
-        users_in_memory: { memory: null }
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\AccessToken
+                property: uuid
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -9,7 +17,7 @@ security:
         main:
             anonymous: lazy
             logout: ~
-            provider: users_in_memory
+            provider: app_user_provider
 
             guard:
                 authenticators:

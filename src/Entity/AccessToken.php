@@ -10,8 +10,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class AccessToken implements UserInterface
 {
-    // ########################################
-
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -20,49 +18,96 @@ class AccessToken implements UserInterface
     private $id;
 
     /**
-     * @var string
-     * @ORM\Column(type="string", length=60, name="token", unique=true, nullable=false)
+     * @ORM\Column(type="string", length=180, unique=true)
      */
-    protected $token;
+    private $uuid;
 
-    // ########################################
+    /**
+     * @ORM\Column(type="json")
+     */
+    private $roles = [];
+
+    /**
+     * @var string The hashed password
+     * @ORM\Column(type="string")
+     */
+    private $password;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    public function getUuid(): ?string
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(string $uuid): self
+    {
+        $this->uuid = $uuid;
+
+        return $this;
+    }
+
     /**
-     * @return string[]
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUsername(): string
+    {
+        return (string) $this->uuid;
+    }
+
+    /**
+     * @see UserInterface
      */
     public function getRoles(): array
     {
-        return [];
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
     }
 
-    public function getPassword(): ?string
+    public function setRoles(array $roles): self
     {
-        return '';
+        $this->roles = $roles;
+
+        return $this;
     }
 
-    public function getSalt(): ?string
+    /**
+     * @see UserInterface
+     */
+    public function getPassword(): string
     {
-        return '';
+        return (string) $this->password;
     }
 
-    public function getUsername(): string
+    public function setPassword(string $password): self
     {
-        return '';
+        $this->password = $password;
+
+        return $this;
     }
 
-    public function eraseCredentials(): void
+    /**
+     * @see UserInterface
+     */
+    public function getSalt()
     {
+        // not needed when using the "bcrypt" algorithm in security.yaml
     }
 
-    public function getToken(): string
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials()
     {
-        return $this->token;
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
     }
-
-    // ########################################
 }

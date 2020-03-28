@@ -44,17 +44,17 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
             $authToken = $request->headers->get('HTTP-X-AUTH-TOKEN');
         }
 
-        return ['auth_token' => $authToken];
+        return ['access_token' => $authToken];
     }
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        if (null === $credentials['auth_token']) {
+        if (null === $credentials['access_token']) {
             return null;
         }
 
         return $this->em->getRepository(AccessToken::class)
-                        ->findOneBy(['token' => $credentials['auth_token']]);
+                        ->findOneBy(['uuid' => $credentials['access_token']]);
     }
 
     public function checkCredentials($credentials, UserInterface $user)

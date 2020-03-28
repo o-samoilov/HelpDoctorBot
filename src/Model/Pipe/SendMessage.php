@@ -32,7 +32,7 @@ class SendMessage extends BaseAbstract
 
     public function getUrl(): string
     {
-        return $this->getHost() . "/user/{$this->uid}/messages/";
+        return $this->getHost() . "user/{$this->uid}/messages/";
     }
 
     public function getData(): array

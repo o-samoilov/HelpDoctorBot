@@ -21,7 +21,7 @@ class Processor
         $response = curl_exec($handle);
 
         if ($response === false) {
-            //todo log
+            //todo exception
             $errno = curl_errno($handle);
             $error = curl_error($handle);
             //error_log("Curl returned error $errno: $error\n");
