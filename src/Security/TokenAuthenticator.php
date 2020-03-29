@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Security;
 
-use App\Entity\AccessToken;
+use App\Entity\AuthToken;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +17,8 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
 class TokenAuthenticator extends AbstractGuardAuthenticator
 {
+    private const AUTH_HEADER_NAME = 'X-AUTH-TOKEN';
+
     private $em;
 
     // ########################################
@@ -36,30 +38,30 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
     public function getCredentials(Request $request)
     {
         $authToken = null;
-        if ($request->headers->has('X-AUTH-TOKEN')) {
-            $authToken = $request->headers->get('X-AUTH-TOKEN');
+        if ($request->headers->has(self::AUTH_HEADER_NAME)) {
+            $authToken = $request->headers->get(self::AUTH_HEADER_NAME);
         }
 
-        if ($request->headers->has('HTTP-X-AUTH-TOKEN')) {
-            $authToken = $request->headers->get('HTTP-X-AUTH-TOKEN');
+        if ($request->headers->has('HTTP-' . self::AUTH_HEADER_NAME)) {
+            $authToken = $request->headers->get('HTTP-' . self::AUTH_HEADER_NAME);
         }
 
-        return ['access_token' => $authToken];
+        return ['auth_token' => $authToken];
     }
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        if (null === $credentials['access_token']) {
+        if (null === $credentials['auth_token']) {
             return null;
         }
 
-        return $this->em->getRepository(AccessToken::class)
-                        ->findOneBy(['uuid' => $credentials['access_token']]);
+        return $this->em->getRepository(AuthToken::class)
+                        ->findOneBy(['uuid' => self::AUTH_HEADER_NAME]);
     }
 
     public function checkCredentials($credentials, UserInterface $user)
     {
-        return true;
+        return $user->getPassword() === $credentials['auth_token'];
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)

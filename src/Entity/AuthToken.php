@@ -6,9 +6,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\AccessTokenRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\AuthTokenRepository")
+ * @ORM\Table(name="auth_token")
  */
-class AccessToken implements UserInterface
+class AuthToken implements UserInterface
 {
     /**
      * @ORM\Id()

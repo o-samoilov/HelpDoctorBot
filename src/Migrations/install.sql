@@ -63,6 +63,23 @@ CREATE TABLE route
     CHARACTER SET utf8mb4,
     COLLATE utf8mb4_unicode_ci;
 
+CREATE TABLE auth_token
+(
+    id       INT(11)      NOT NULL AUTO_INCREMENT,
+    uuid     VARCHAR(180) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    roles    TEXT         NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE INDEX UNIQ_B6A2DD68D17F50A6 (uuid)
+)
+    ENGINE = INNODB,
+    CHARACTER SET utf8mb4,
+    COLLATE utf8mb4_unicode_ci;
+
+########################################################
+
+INSERT INTO auth_token (id, uuid, password, roles) VALUES (1, 'X-AUTH-TOKEN', '#AUTH_TOKEN#', '{}');
+
 ########################################################
 
 INSERT INTO city (id, name) VALUES (1, 'Київ');
