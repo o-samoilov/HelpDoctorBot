@@ -27,13 +27,17 @@ abstract class BaseAbstract
 
     // ########################################
 
-    public function process(): void
+    public function process(): array
     {
-        $response = $this->curlProcessor->processPost($this->getUrl(), $this->getData());
+        if ($this->getRequestType() === self::REQUEST_TYPE_POST) {
+            [$httpCode, $responseData] = $this->curlProcessor->processPost($this->getUrl(), $this->getData());
+        }
 
         if ($response['status'] !== 'ok') {
             //todo log
         }
+
+        return $response;
     }
 
     // ########################################

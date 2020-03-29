@@ -11,6 +11,7 @@ class Processor
     public function processPost(string $url, array $data): array
     {
         $handle = curl_init($url);
+
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 5);
         curl_setopt($handle, CURLOPT_TIMEOUT, 60);
@@ -21,24 +22,26 @@ class Processor
         $response = curl_exec($handle);
 
         if ($response === false) {
-            //todo exception
             $errno = curl_errno($handle);
             $error = curl_error($handle);
-            //error_log("Curl returned error $errno: $error\n");
+            $info  = curl_getinfo($handle);
 
             curl_close($handle);
 
-            return false;
+            throw new Exception\UnableProcess('Unable to process request.', [
+                'curl_errno' => $errno,
+                'curl_error' => $error,
+                'curl_info'  => $info,
+            ]);
         }
 
         $httpCode = (int)curl_getinfo($handle, CURLINFO_HTTP_CODE);
         curl_close($handle);
 
-        if ($httpCode !== 200) {
-            //todo log
-        }
-
-        return (array)json_decode($response, true);
+        return [
+            $httpCode,
+            (array)json_decode($response, true),
+        ];
     }
 
     // ########################################

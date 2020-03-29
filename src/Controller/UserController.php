@@ -2,11 +2,10 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 
-class UserController extends AbstractController
+class UserController extends BaseAbstract
 {
     // ########################################
 
@@ -111,16 +110,6 @@ class UserController extends AbstractController
                 'description' => $user->getDescription(),
                 'city_id'     => $user->getCity()->getId(),
             ],
-        ]);
-    }
-
-    // ----------------------------------------
-
-    private function createErrorResponse(string $message): \Symfony\Component\HttpFoundation\JsonResponse
-    {
-        return $this->json([
-            'status'  => 'error',
-            'message' => $message,
         ]);
     }
 

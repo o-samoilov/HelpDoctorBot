@@ -2,11 +2,10 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-class RouteController extends AbstractController
+class RouteController extends BaseAbstract
 {
     private const MAX_PASSENGERS_COUNT = 6;
 
@@ -125,18 +124,18 @@ class RouteController extends AbstractController
     }
 
     /**
-     * @Route("/route/send  ",  methods={"POST"})
+     * @Route("/route/send",  methods={"POST"})
      *
-     * @param \App\Repository\RouteRepository $routeRepository
-     * @param \App\Repository\UserRepository  $userRepository
-     * @param \App\Model\Pipe\SendMessage     $pipeSendMessage
+     * @param \App\Repository\RouteRepository     $routeRepository
+     * @param \App\Repository\UserRepository      $userRepository
+     * @param \App\Model\Pipe\Command\SendMessage $pipeSendMessage
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function sendAction(
         \App\Repository\RouteRepository $routeRepository,
         \App\Repository\UserRepository $userRepository,
-        \App\Model\Pipe\SendMessage $pipeSendMessage
+        \App\Model\Pipe\Command\SendMessage $pipeSendMessage
     ): \Symfony\Component\HttpFoundation\JsonResponse {
         $request = Request::createFromGlobals();
         $pipeUid = $request->get('pipe_uid');
@@ -178,16 +177,6 @@ TEXT
 
         return $this->json([
             'status' => 'ok',
-        ]);
-    }
-
-    // ----------------------------------------
-
-    private function createErrorResponse(string $message): \Symfony\Component\HttpFoundation\JsonResponse
-    {
-        return $this->json([
-            'status'  => 'error',
-            'message' => $message,
         ]);
     }
 

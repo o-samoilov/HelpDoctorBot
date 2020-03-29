@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Model\Pipe;
+namespace App\Model\Pipe\Command;
 
-class SendMessage extends BaseAbstract
+class SendMessage extends \App\Model\Pipe\BaseAbstract
 {
     /** @var int */
     private $uid;
