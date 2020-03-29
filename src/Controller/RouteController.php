@@ -138,13 +138,13 @@ class RouteController extends BaseAbstract
         \App\Model\Pipe\Command\SendMessage $pipeSendMessage
     ): \Symfony\Component\HttpFoundation\JsonResponse {
         $request = Request::createFromGlobals();
-        $pipeUid = $request->get('pipe_uid');
+        $data    = (array)json_decode($request->getContent(), true);
 
-        if ($pipeUid === null) {
-            return $this->createErrorResponse('Input data error.');
+        if (!isset($data['pipe_uid']) || !is_int($data['pipe_uid'])) {
+            return $this->createErrorResponse('Invalid key "pipe_uid".');
         }
 
-        $user = $userRepository->findByPipeUid((int)$pipeUid);
+        $user = $userRepository->findByPipeUid(($data['pipe_uid']));
         if ($user === null) {
             return $this->createErrorResponse('User not found');
         }

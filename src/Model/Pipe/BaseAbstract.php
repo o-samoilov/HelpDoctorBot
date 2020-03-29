@@ -75,7 +75,7 @@ abstract class BaseAbstract
             return $this->responseFactory->createFail($errorMessage);
         }
 
-        return $this->responseFactory->createSuccess($responseData['data']);
+        return $this->responseFactory->createSuccess($responseData['data'] ?? []);
     }
 
     // ########################################
