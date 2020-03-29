@@ -40,15 +40,16 @@ CREATE TABLE user
 DROP TABLE IF EXISTS route;
 CREATE TABLE route
 (
-    id            INT(11)      NOT NULL AUTO_INCREMENT,
-    from_district INT(11)      NOT NULL,
-    to_district   INT(11)      NOT NULL,
-    city_id       INT(11)      NOT NULL,
-    user_id       INT(11)      NOT NULL,
-    from_comment  VARCHAR(255) DEFAULT NULL,
-    to_comment    VARCHAR(255) DEFAULT NULL,
-    time          VARCHAR(255) NOT NULL,
-    date          VARCHAR(255) NOT NULL,
+    id               INT(11)      NOT NULL AUTO_INCREMENT,
+    from_district    INT(11)      NOT NULL,
+    to_district      INT(11)      NOT NULL,
+    city_id          INT(11)      NOT NULL,
+    user_id          INT(11)      NOT NULL,
+    from_comment     VARCHAR(255) NOT NULL,
+    to_comment       VARCHAR(255) NOT NULL,
+    time             VARCHAR(255) NOT NULL,
+    date             VARCHAR(255) NOT NULL,
+    passengers_count INT(11)      NOT NULL,
     INDEX IDX_2C42079772EB41D (from_district),
     INDEX IDX_2C420798BAC62AF (city_id),
     INDEX IDX_2C42079A76ED395 (user_id),
@@ -63,6 +64,7 @@ CREATE TABLE route
     CHARACTER SET utf8mb4,
     COLLATE utf8mb4_unicode_ci;
 
+DROP TABLE IF EXISTS auth_token;
 CREATE TABLE auth_token
 (
     id       INT(11)      NOT NULL AUTO_INCREMENT,
@@ -78,50 +80,86 @@ CREATE TABLE auth_token
 
 ########################################################
 
-INSERT INTO auth_token (id, uuid, password, roles) VALUES (1, 'X-AUTH-TOKEN', '#AUTH_TOKEN#', '{}');
+INSERT INTO auth_token (id, uuid, password, roles)
+VALUES (1, 'X-AUTH-TOKEN', '#AUTH_TOKEN#', '{}');
 
 ########################################################
 
-INSERT INTO city (id, name) VALUES (1, 'Київ');
-INSERT INTO city (id, name) VALUES (2, 'Дніпро');
-INSERT INTO city (id, name) VALUES (3, 'Харьків');
-INSERT INTO city (id, name) VALUES (4, 'Одесса');
+INSERT INTO city (id, name)
+VALUES (1, 'Київ');
+INSERT INTO city (id, name)
+VALUES (2, 'Дніпро');
+INSERT INTO city (id, name)
+VALUES (3, 'Харьків');
+INSERT INTO city (id, name)
+VALUES (4, 'Одесса');
 
 #Kiev
-INSERT INTO district (id, city_id, name) VALUES (101, 1, 'Голосіївський');
-INSERT INTO district (id, city_id, name) VALUES (102, 1, 'Святошинський');
-INSERT INTO district (id, city_id, name) VALUES (103, 1, 'Солом''янський');
-INSERT INTO district (id, city_id, name) VALUES (104, 1, 'Оболонський');
-INSERT INTO district (id, city_id, name) VALUES (105, 1, 'Подільський');
-INSERT INTO district (id, city_id, name) VALUES (106, 1, 'Печерський');
-INSERT INTO district (id, city_id, name) VALUES (107, 1, 'Шевченківський');
-INSERT INTO district (id, city_id, name) VALUES (108, 1, 'Дарницький');
-INSERT INTO district (id, city_id, name) VALUES (109, 1, 'Дніпровський');
-INSERT INTO district (id, city_id, name) VALUES (110, 1, 'Деснянський');
+INSERT INTO district (id, city_id, name)
+VALUES (101, 1, 'Голосіївський');
+INSERT INTO district (id, city_id, name)
+VALUES (102, 1, 'Святошинський');
+INSERT INTO district (id, city_id, name)
+VALUES (103, 1, 'Солом''янський');
+INSERT INTO district (id, city_id, name)
+VALUES (104, 1, 'Оболонський');
+INSERT INTO district (id, city_id, name)
+VALUES (105, 1, 'Подільський');
+INSERT INTO district (id, city_id, name)
+VALUES (106, 1, 'Печерський');
+INSERT INTO district (id, city_id, name)
+VALUES (107, 1, 'Шевченківський');
+INSERT INTO district (id, city_id, name)
+VALUES (108, 1, 'Дарницький');
+INSERT INTO district (id, city_id, name)
+VALUES (109, 1, 'Дніпровський');
+INSERT INTO district (id, city_id, name)
+VALUES (110, 1, 'Деснянський');
 
 #Dnipro
-INSERT INTO district (id, city_id, name) VALUES (201, 2, 'Амур-Нижньодніпровський');
-INSERT INTO district (id, city_id, name) VALUES (202, 2, 'Шевченківський');
-INSERT INTO district (id, city_id, name) VALUES (203, 2, 'Соборний');
-INSERT INTO district (id, city_id, name) VALUES (204, 2, 'Індустріальний');
-INSERT INTO district (id, city_id, name) VALUES (205, 2, 'Центральний');
-INSERT INTO district (id, city_id, name) VALUES (206, 2, 'Чечелівський');
-INSERT INTO district (id, city_id, name) VALUES (207, 2, 'Новокодацький');
-INSERT INTO district (id, city_id, name) VALUES (208, 2, 'Самарський');
+INSERT INTO district (id, city_id, name)
+VALUES (201, 2, 'Амур-Нижньодніпровський');
+INSERT INTO district (id, city_id, name)
+VALUES (202, 2, 'Шевченківський');
+INSERT INTO district (id, city_id, name)
+VALUES (203, 2, 'Соборний');
+INSERT INTO district (id, city_id, name)
+VALUES (204, 2, 'Індустріальний');
+INSERT INTO district (id, city_id, name)
+VALUES (205, 2, 'Центральний');
+INSERT INTO district (id, city_id, name)
+VALUES (206, 2, 'Чечелівський');
+INSERT INTO district (id, city_id, name)
+VALUES (207, 2, 'Новокодацький');
+INSERT INTO district (id, city_id, name)
+VALUES (208, 2, 'Самарський');
 
 #Kharkiv
-INSERT INTO district (id, city_id, name) VALUES (301, 3, 'Шевченківський');
-INSERT INTO district (id, city_id, name) VALUES (302, 3, 'Київський');
-INSERT INTO district (id, city_id, name) VALUES (303, 3, 'Слобідської');
-INSERT INTO district (id, city_id, name) VALUES (304, 3, 'Холодногорский');
-INSERT INTO district (id, city_id, name) VALUES (305, 3, 'Московський');
-INSERT INTO district (id, city_id, name) VALUES (306, 3, 'Новобаварський');
-INSERT INTO district (id, city_id, name) VALUES (307, 3, 'Індустріальний');
-INSERT INTO district (id, city_id, name) VALUES (308, 3, 'Немишлянська');
-INSERT INTO district (id, city_id, name) VALUES (309, 3, 'Основ''янський');
+INSERT INTO district (id, city_id, name)
+VALUES (301, 3, 'Шевченківський');
+INSERT INTO district (id, city_id, name)
+VALUES (302, 3, 'Київський');
+INSERT INTO district (id, city_id, name)
+VALUES (303, 3, 'Слобідської');
+INSERT INTO district (id, city_id, name)
+VALUES (304, 3, 'Холодногорский');
+INSERT INTO district (id, city_id, name)
+VALUES (305, 3, 'Московський');
+INSERT INTO district (id, city_id, name)
+VALUES (306, 3, 'Новобаварський');
+INSERT INTO district (id, city_id, name)
+VALUES (307, 3, 'Індустріальний');
+INSERT INTO district (id, city_id, name)
+VALUES (308, 3, 'Немишлянська');
+INSERT INTO district (id, city_id, name)
+VALUES (309, 3, 'Основ''янський');
 
 #Odessa
-INSERT INTO district (id, city_id, name) VALUES (401, 4, 'Суворовський');
-INSERT INTO district (id, city_id, name) VALUES (402, 4, 'Приморський');
-INSERT INTO district (id, city_id, name) VALUES (403, 4, 'Маліновський');
-INSERT INTO district (id, city_id, name) VALUES (404, 4, 'Киевский');
+INSERT INTO district (id, city_id, name)
+VALUES (401, 4, 'Суворовський');
+INSERT INTO district (id, city_id, name)
+VALUES (402, 4, 'Приморський');
+INSERT INTO district (id, city_id, name)
+VALUES (403, 4, 'Маліновський');
+INSERT INTO district (id, city_id, name)
+VALUES (404, 4, 'Киевский');

@@ -28,7 +28,7 @@ class Route
 
     /**
      * @var string
-     * @ORM\Column(type="string", name="from_comment", nullable=true)
+     * @ORM\Column(type="string", name="from_comment", nullable=false)
      */
     protected $fromComment;
 
@@ -41,7 +41,7 @@ class Route
 
     /**
      * @var string
-     * @ORM\Column(type="string", name="to_comment", nullable=true)
+     * @ORM\Column(type="string", name="to_comment", nullable=false)
      */
     protected $toComment;
 
@@ -56,6 +56,12 @@ class Route
      * @ORM\Column(type="string", name="date", nullable=false)
      */
     protected $date;
+
+    /**
+     * @var int
+     * @ORM\Column(type="integer", name="passengers_count", nullable=false)
+     */
+    protected $passengersCount;
 
     /**
      * @var \App\Entity\City
@@ -164,6 +170,20 @@ class Route
     public function setDate(string $date): self
     {
         $this->date = $date;
+
+        return $this;
+    }
+
+    // ########################################
+
+    public function getPassengersCount(): int
+    {
+        return $this->passengersCount;
+    }
+
+    public function setPassengersCount(int $passengersCount): self
+    {
+        $this->passengersCount = $passengersCount;
 
         return $this;
     }

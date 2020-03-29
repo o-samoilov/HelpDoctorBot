@@ -8,6 +8,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class RouteController extends AbstractController
 {
+    private const MAX_PASSENGERS_COUNT = 6;
+
     // ########################################
 
     /**
@@ -88,6 +90,15 @@ class RouteController extends AbstractController
             return $this->createErrorResponse('Invalid key "date".');
         }
 
+        if (
+            !isset($data['count_passengers']) ||
+            !is_int($data['count_passengers']) ||
+            $data['count_passengers'] < 1 ||
+            $data['count_passengers'] > self::MAX_PASSENGERS_COUNT
+        ) {
+            return $this->createErrorResponse('Invalid key "count_passengers".');
+        }
+
         $commentFrom = $data['comment_from'];
         $commentTo   = $data['comment_to'];
         $time        = $data['time'];
@@ -112,7 +123,7 @@ class RouteController extends AbstractController
     }
 
     /**
-     * @Route("/route/find",  methods={"POST"})
+     * @Route("/route/send  ",  methods={"POST"})
      *
      * @param \App\Repository\RouteRepository $routeRepository
      * @param \App\Repository\UserRepository  $userRepository
@@ -153,6 +164,8 @@ class RouteController extends AbstractController
 
 🕔Час: {$route->getTime()}
 📅Дата: {$route->getDate()}
+
+🙋‍♀️Кількість пасажирів: {$route->getPassengersCount()}
 
 Видалити маршрут: /delete_route_{$route->getId()}
 TEXT
