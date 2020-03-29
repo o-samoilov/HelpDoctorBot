@@ -33,11 +33,13 @@ abstract class BaseAbstract
             [$httpCode, $responseData] = $this->curlProcessor->processPost($this->getUrl(), $this->getData());
         }
 
-        if ($response['status'] !== 'ok') {
+        [$httpCode, $responseData] = $this->curlProcessor->processGet($this->getUrl());
+
+        if ($responseData['status'] !== 'ok') {
             //todo log
         }
 
-        return $response;
+        return $responseData['data'];
     }
 
     // ########################################

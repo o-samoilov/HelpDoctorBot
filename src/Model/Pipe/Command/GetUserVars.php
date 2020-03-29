@@ -22,7 +22,7 @@ class GetUserVars extends \App\Model\Pipe\BaseAbstract
 
     public function getUrl(): string
     {
-        return $this->getHost() . "user/{$this->uid}/exp?apiley={$this->getApiKey()}";
+        return $this->getHost() . "user/{$this->uid}/exp?apikey={$this->getApiKey()}";
     }
 
     public function getData(): array
