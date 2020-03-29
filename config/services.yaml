@@ -29,3 +29,8 @@ services:
     App\Model\Config\YamlLoader:
         arguments:
             $baseDir: '%kernel.project_dir%'
+
+    maintenance_listener:
+        class: App\Event\MaintenanceListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }

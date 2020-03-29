@@ -91,18 +91,19 @@ class RouteController extends AbstractController
         }
 
         if (
-            !isset($data['count_passengers']) ||
-            !is_int($data['count_passengers']) ||
-            $data['count_passengers'] < 1 ||
-            $data['count_passengers'] > self::MAX_PASSENGERS_COUNT
+            !isset($data['passengers_count']) ||
+            !is_int($data['passengers_count']) ||
+            $data['passengers_count'] < 1 ||
+            $data['passengers_count'] > self::MAX_PASSENGERS_COUNT
         ) {
-            return $this->createErrorResponse('Invalid key "count_passengers".');
+            return $this->createErrorResponse('Invalid key "passengers_count".');
         }
 
-        $commentFrom = $data['comment_from'];
-        $commentTo   = $data['comment_to'];
-        $time        = $data['time'];
-        $date        = $data['date'];
+        $commentFrom     = $data['comment_from'];
+        $commentTo       = $data['comment_to'];
+        $time            = $data['time'];
+        $date            = $data['date'];
+        $passengersCount = $data['passengers_count'];
 
         $route = new \App\Entity\Route();
         $route->setFromDistrict($fromDistrict)
@@ -111,6 +112,7 @@ class RouteController extends AbstractController
               ->setToComment($commentTo)
               ->setTime($time)
               ->setDate($date)
+              ->setPassengersCount($passengersCount)
               ->setCity($city)
               ->setUser($user);
 
