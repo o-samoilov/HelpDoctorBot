@@ -91,7 +91,6 @@ class UserController extends BaseAbstract
         }
 
         $pipeUid     = $data['pipe_uid'];
-        $description = $data['description'];
         $role        = $data['role'];
         $username    = $data['username'];
         $firstName   = $data['first_name'];
@@ -102,7 +101,6 @@ class UserController extends BaseAbstract
              ->setUsername($username)
              ->setFirstName($firstName)
              ->setLastName($lastName)
-             ->setPhone($description)
              ->setCity($city);
 
         if ($role === \App\Entity\User::ROLE_DRIVER) {
