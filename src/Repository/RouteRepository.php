@@ -21,6 +21,20 @@ class RouteRepository extends ServiceEntityRepository
         parent::__construct($registry, Route::class);
     }
 
+    // ########################################
+
+    /**
+     * @param \App\Entity\User $user
+     *
+     * @return Route[]
+     */
+    public function findByUser(\App\Entity\User $user): array
+    {
+        return $this->findBy([
+            'user' => $user,
+        ]);
+    }
+
     public function save(Route $route): void
     {
         $entityManager = $this->getEntityManager();

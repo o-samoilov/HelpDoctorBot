@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class RouteController extends BaseAbstract
 {
     private const MAX_PASSENGERS_COUNT = 6;
+    private const MAX_ROUTE_COUNT      = 15;
 
     // ########################################
 
@@ -72,6 +73,7 @@ class RouteController extends BaseAbstract
         if (!isset($data['to_district_id']) || !is_int($data['to_district_id'])) {
             return $this->createErrorResponse('Invalid key "to_district_id".');
         }
+
         $toDistrict = $districtRepository->findByIdAndCity($data['to_district_id'], $city);
         if ($toDistrict === null) {
             return $this->createErrorResponse('To district not found.');
@@ -96,6 +98,11 @@ class RouteController extends BaseAbstract
             $data['passengers_count'] > self::MAX_PASSENGERS_COUNT
         ) {
             return $this->createErrorResponse('Invalid key "passengers_count".');
+        }
+
+        $routes = $routeRepository->findByUser($user);
+        if (count($routes) > self::MAX_ROUTE_COUNT) {
+            return $this->createErrorResponse('Limit max routes.');
         }
 
         $commentFrom     = $data['comment_from'];
@@ -144,14 +151,24 @@ class RouteController extends BaseAbstract
             return $this->createErrorResponse('Invalid key "pipe_uid".');
         }
 
+        if (!isset($data['offset']) || !is_int($data['offset'])) {
+            return $this->createErrorResponse('Invalid key "offset".');
+        }
+
+        if (!isset($data['limit']) || !is_int($data['limit'])) {
+            return $this->createErrorResponse('Invalid key "limit".');
+        }
+
+        $offset = $data['offset'];
+        $limit  = $data['limit'];
+
         $user = $userRepository->findByPipeUid(($data['pipe_uid']));
         if ($user === null) {
             return $this->createErrorResponse('User not found');
         }
 
-        $routes = $routeRepository->findBy([
-            'user' => $user,
-        ]);
+        $routes = $routeRepository->findByUser($user);
+        $routes = array_slice($routes, $offset, $limit);
 
         $pipeSendMessage->setUid($user->getPipeUid());
 
