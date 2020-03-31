@@ -152,7 +152,7 @@ class User
         return $this->lastName !== null;
     }
 
-    public function getLastName(): string
+    public function getLastName(): ?string
     {
         return $this->lastName;
     }
