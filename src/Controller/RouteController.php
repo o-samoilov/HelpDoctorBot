@@ -151,16 +151,16 @@ class RouteController extends BaseAbstract
             return $this->createErrorResponse('Invalid key "pipe_uid".');
         }
 
-        if (!isset($data['offset']) || !is_int($data['offset'])) {
+        if (!isset($data['offset'])) {
             return $this->createErrorResponse('Invalid key "offset".');
         }
 
-        if (!isset($data['limit']) || !is_int($data['limit'])) {
+        if (!isset($data['limit'])) {
             return $this->createErrorResponse('Invalid key "limit".');
         }
 
-        $offset = $data['offset'];
-        $limit  = $data['limit'];
+        $offset = (int)$data['offset'];
+        $limit  = (int)$data['limit'];
 
         $user = $userRepository->findByPipeUid(($data['pipe_uid']));
         if ($user === null) {
