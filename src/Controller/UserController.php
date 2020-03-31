@@ -94,7 +94,7 @@ class UserController extends BaseAbstract
         $role        = $data['role'];
         $username    = $data['username'];
         $firstName   = $data['first_name'];
-        $lastName    = $data['last_name'];
+        $lastName    = !empty($data['last_name']) ? $data['last_name'] : null;
 
         $user = new \App\Entity\User();
         $user->setPipeUid($pipeUid)
