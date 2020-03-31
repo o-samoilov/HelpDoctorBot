@@ -121,7 +121,8 @@ class RouteController extends BaseAbstract
               ->setDate($date)
               ->setPassengersCount($passengersCount)
               ->setCity($city)
-              ->setUser($user);
+              ->setUser($user)
+              ->markActive();
 
         $routeRepository->save($route);
 
@@ -248,6 +249,8 @@ TEXT
         if ($route->getUser()->getId() !== $user->getId()) {
             return $this->createErrorResponse('Route not register by current user');
         }
+
+        $routeRepository->delete($route);
 
         return $this->json([
             'status' => 'ok',

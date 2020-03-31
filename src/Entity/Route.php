@@ -77,6 +77,12 @@ class Route
      */
     protected $user;
 
+    /**
+     * @var bool
+     * @ORM\Column(type="boolean", name="is_active", nullable=false)
+     */
+    protected $isActive;
+
     // ########################################
 
     public function __construct()
@@ -214,6 +220,27 @@ class Route
         $this->user = $user;
 
         return $this;
+    }
+
+    // ########################################
+
+    public function markActive(): self
+    {
+        $this->isActive = true;
+
+        return $this;
+    }
+
+    public function markInactive(): self
+    {
+        $this->isActive = false;
+
+        return $this;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->isActive;
     }
 
     // ########################################

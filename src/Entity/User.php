@@ -22,14 +22,41 @@ class User
      */
     private $id;
 
-    /** @ORM\Column(type="integer", name="pipe_uid", unique=true, nullable=false) */
+    /**
+     * @var int
+     * @ORM\Column(type="integer", name="pipe_uid", unique=true, nullable=false)
+     */
     protected $pipeUid;
 
-    /** @ORM\Column(type="integer", name="role", nullable=false) */
+    /**
+     * @var int
+     * @ORM\Column(type="integer", name="role", nullable=false)
+     */
     protected $role;
 
-    /** @ORM\Column(type="string", name="description", nullable=true) */
-    protected $description;
+    /**
+     * @var string
+     * @ORM\Column(type="string", name="username", nullable=false)
+     */
+    protected $username;
+
+    /**
+     * @var string
+     * @ORM\Column(type="string", name="first_name", nullable=false)
+     */
+    protected $firstName;
+
+    /**
+     * @var string|null
+     * @ORM\Column(type="string", name="last_name", nullable=true)
+     */
+    protected $lastName;
+
+    /**
+     * @var string|null
+     * @ORM\Column(type="string", name="phone", nullable=true)
+     */
+    protected $phone;
 
     /**
      * @var \App\Entity\City
@@ -92,14 +119,66 @@ class User
 
     // ########################################
 
-    public function getDescription(): string
+    public function getUsername(): string
     {
-        return $this->description;
+        return $this->username;
     }
 
-    public function setDescription($description): self
+    public function setUsername(string $username): self
     {
-        $this->description = $description;
+        $this->username = $username;
+
+        return $this;
+    }
+
+    // ########################################
+
+    public function getFirstName(): string
+    {
+        return $this->firstName;
+    }
+
+    public function setFirstName(string $firstName): self
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    // ########################################
+
+    public function hasLastName(): bool
+    {
+        return $this->lastName !== null;
+    }
+
+    public function getLastName(): string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(?string $lastName): self
+    {
+        $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    // ########################################
+
+    public function hasPhone(): bool
+    {
+        return $this->phone !== null;
+    }
+
+    public function getPhone(): string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
 
         return $this;
     }

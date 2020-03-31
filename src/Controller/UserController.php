@@ -32,14 +32,11 @@ class UserController extends BaseAbstract
 
         return $this->json([
             'status' => 'ok',
-            'data'   => [
-                'pipe_uid'    => $user->getPipeUid(),
-                'role'        => $user->getRole(),
-                'description' => $user->getDescription(),
-                'city_id'     => $user->getCity()->getId(),
-            ],
+            'data'   => $this->userToArray($user),
         ]);
     }
+
+    // ########################################
 
     /**
      * @Route("/user/create", methods={"POST"})
@@ -59,8 +56,16 @@ class UserController extends BaseAbstract
             return $this->createErrorResponse('Invalid key "pipe_uid".');
         }
 
-        if (!isset($data['description']) || !is_string($data['description'])) {
-            return $this->createErrorResponse('Invalid key "description".');
+        if (!isset($data['username']) || !is_string($data['username'])) {
+            return $this->createErrorResponse('Invalid key "username".');
+        }
+
+        if (!isset($data['first_name']) || !is_string($data['first_name'])) {
+            return $this->createErrorResponse('Invalid key "first_name".');
+        }
+
+        if (!isset($data['last_name']) || !is_string($data['last_name'])) {
+            return $this->createErrorResponse('Invalid key "last_name".');
         }
 
         if (!isset($data['role']) || !in_array($data['role'], [
@@ -88,10 +93,16 @@ class UserController extends BaseAbstract
         $pipeUid     = $data['pipe_uid'];
         $description = $data['description'];
         $role        = $data['role'];
+        $username    = $data['username'];
+        $firstName   = $data['first_name'];
+        $lastName    = $data['last_name'];
 
         $user = new \App\Entity\User();
         $user->setPipeUid($pipeUid)
-             ->setDescription($description)
+             ->setUsername($username)
+             ->setFirstName($firstName)
+             ->setLastName($lastName)
+             ->setPhone($description)
              ->setCity($city);
 
         if ($role === \App\Entity\User::ROLE_DRIVER) {
@@ -104,13 +115,88 @@ class UserController extends BaseAbstract
 
         return $this->json([
             'status' => 'ok',
-            'data'   => [
-                'pipe_uid'    => $user->getPipeUid(),
-                'role'        => $user->getRole(),
-                'description' => $user->getDescription(),
-                'city_id'     => $user->getCity()->getId(),
-            ],
+            'data'   => $this->userToArray($user),
         ]);
+    }
+
+    // ########################################
+
+    private function userToArray(\App\Entity\User $user): array
+    {
+        $fullName = $user->getFirstName();
+        if ($user->hasLastName()) {
+            $fullName .= " {$user->getLastName()}";
+        }
+
+        return [
+            'pipe_uid'   => $user->getPipeUid(),
+            'username'   => $user->getUsername(),
+            'full_name'  => $fullName,
+            'first_name' => $user->getFirstName(),
+            'lastName'   => $user->getLastName(),
+            'phone'      => $user->getPhone(),
+            'role'       => $user->getRole(),
+            'city_id'    => $user->getCity()->getId(),
+        ];
+    }
+
+    // ########################################
+
+    /**
+     * @Route("/user/sendProfile", methods={"POST"})
+     * @param \App\Repository\UserRepository      $userRepository
+     * @param \App\Model\Pipe\Command\SendMessage $pipeSendMessage
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function sendProfileAction(
+        \App\Repository\UserRepository $userRepository,
+        \App\Model\Pipe\Command\SendMessage $pipeSendMessage
+    ): \Symfony\Component\HttpFoundation\JsonResponse {
+        $request = Request::createFromGlobals();
+        $data    = (array)json_decode($request->getContent(), true);
+
+        if (!isset($data['pipe_uid']) || !is_int($data['pipe_uid'])) {
+            return $this->createErrorResponse('Invalid key "pipe_uid".');
+        }
+
+        $user = $userRepository->findByPipeUid($data['pipe_uid']);
+        if ($user !== null) {
+            return $this->createErrorResponse('User already exist.');
+        }
+
+        $pipeSendMessage->setUid($user->getPipeUid());
+        $pipeSendMessage->setMessage($this->generateProfileText($user));
+
+        return $this->json([
+            'status' => 'ok',
+        ]);
+    }
+
+    // ########################################
+
+    private function generateProfileText(\App\Entity\User $user): string
+    {
+        if ($user->isRoleDriver()) {
+            $roleText = 'Водій🚘';
+        } else {
+            $roleText = 'Лікар/Працівник екстрених служб🦺';
+        }
+
+        $fullName = $user->getFirstName();
+        if ($user->hasLastName()) {
+            $fullName .= " {$user->getLastName()}";
+        }
+
+        $phone = $user->hasPhone() ? $user->getPhone() : '-';
+
+        return <<<TEXT
+Роль: {$roleText}
+Ім'я: {$fullName}
+Telegram username: {$user->getUsername()}
+Телефон: {$phone}
+Місто: {$user->getCity()->getName()}
+TEXT;
     }
 
     // ########################################
