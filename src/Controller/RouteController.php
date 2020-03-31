@@ -9,6 +9,7 @@ class RouteController extends BaseAbstract
 {
     private const MAX_PASSENGERS_COUNT = 6;
     private const MAX_ROUTE_COUNT      = 15;
+    private const SEND_LIMIT           = 3;
 
     // ########################################
 
@@ -155,20 +156,31 @@ class RouteController extends BaseAbstract
             return $this->createErrorResponse('Invalid key "offset".');
         }
 
-        if (!isset($data['limit'])) {
-            return $this->createErrorResponse('Invalid key "limit".');
-        }
-
         $offset = (int)$data['offset'];
-        $limit  = (int)$data['limit'];
 
         $user = $userRepository->findByPipeUid(($data['pipe_uid']));
         if ($user === null) {
             return $this->createErrorResponse('User not found');
         }
 
-        $routes = $routeRepository->findByUser($user);
-        $routes = array_slice($routes, $offset, $limit);
+        $routes      = $routeRepository->findByUser($user);
+        $routesCount = count($routes);
+
+        if ($routesCount === 0) {
+            return $this->json([
+                'status' => 'ok',
+                'offset' => 0,
+            ]);
+        }
+
+        if ($routesCount <= $offset) {
+            return $this->json([
+                'status' => 'ok',
+                'offset' => 0,
+            ]);
+        }
+
+        $routes = array_slice($routes, $offset, self::SEND_LIMIT);
 
         $pipeSendMessage->setUid($user->getPipeUid());
 
@@ -194,6 +206,7 @@ TEXT
 
         return $this->json([
             'status' => 'ok',
+            'offset' => $offset + self::SEND_LIMIT >= $routesCount ? 0 : $routesCount + self::SEND_LIMIT,
         ]);
     }
 
