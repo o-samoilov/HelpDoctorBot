@@ -206,7 +206,7 @@ TEXT
 
         return $this->json([
             'status' => 'ok',
-            'offset' => $offset + self::SEND_LIMIT >= $routesCount ? 0 : $routesCount + self::SEND_LIMIT,
+            'offset' => $offset + self::SEND_LIMIT >= $routesCount ? 0 : $offset + self::SEND_LIMIT,
         ]);
     }
 
