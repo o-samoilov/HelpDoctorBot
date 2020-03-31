@@ -167,7 +167,12 @@ class RouteController extends BaseAbstract
         $routes      = $routeRepository->findByUser($user);
         $routesCount = count($routes);
 
+        $pipeSendMessage->setUid($user->getPipeUid());
+
         if ($routesCount === 0) {
+            $pipeSendMessage->setMessage('У вас немає маршрутів, додайте перший маршрут вже зараз!');
+            $pipeSendMessage->process();
+
             return $this->json([
                 'status' => 'ok',
                 'offset' => 0,
@@ -183,7 +188,6 @@ class RouteController extends BaseAbstract
 
         $routes = array_slice($routes, $offset, self::SEND_LIMIT);
 
-        $pipeSendMessage->setUid($user->getPipeUid());
 
         foreach ($routes as $route) {
             $pipeSendMessage->setMessage(<<<TEXT

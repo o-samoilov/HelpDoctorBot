@@ -171,7 +171,7 @@ class User
         return $this->phone !== null;
     }
 
-    public function getPhone(): string
+    public function getPhone(): ?string
     {
         return $this->phone;
     }

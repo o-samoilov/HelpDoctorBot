@@ -90,11 +90,11 @@ class UserController extends BaseAbstract
             return $this->createErrorResponse('User already exist.');
         }
 
-        $pipeUid     = $data['pipe_uid'];
-        $role        = $data['role'];
-        $username    = $data['username'];
-        $firstName   = $data['first_name'];
-        $lastName    = !empty($data['last_name']) ? $data['last_name'] : null;
+        $pipeUid   = $data['pipe_uid'];
+        $role      = $data['role'];
+        $username  = $data['username'];
+        $firstName = $data['first_name'];
+        $lastName  = !empty($data['last_name']) ? $data['last_name'] : null;
 
         $user = new \App\Entity\User();
         $user->setPipeUid($pipeUid)
@@ -159,12 +159,13 @@ class UserController extends BaseAbstract
         }
 
         $user = $userRepository->findByPipeUid($data['pipe_uid']);
-        if ($user !== null) {
-            return $this->createErrorResponse('User already exist.');
+        if ($user === null) {
+            return $this->createErrorResponse('User not found.');
         }
 
-        $pipeSendMessage->setUid($user->getPipeUid());
-        $pipeSendMessage->setMessage($this->generateProfileText($user));
+        $pipeSendMessage->setUid($user->getPipeUid())
+                        ->setMessage($this->generateProfileText($user));
+        $pipeSendMessage->process();
 
         return $this->json([
             'status' => 'ok',
@@ -176,9 +177,9 @@ class UserController extends BaseAbstract
     private function generateProfileText(\App\Entity\User $user): string
     {
         if ($user->isRoleDriver()) {
-            $roleText = 'Водій🚘';
+            $roleText = 'Водій';
         } else {
-            $roleText = 'Лікар/Працівник екстрених служб🦺';
+            $roleText = 'Лікар/Працівник екстрених служб';
         }
 
         $fullName = $user->getFirstName();
@@ -189,11 +190,11 @@ class UserController extends BaseAbstract
         $phone = $user->hasPhone() ? $user->getPhone() : '-';
 
         return <<<TEXT
-Роль: {$roleText}
-Ім'я: {$fullName}
-Telegram username: {$user->getUsername()}
-Телефон: {$phone}
-Місто: {$user->getCity()->getName()}
+▶️Роль: {$roleText}
+👱‍♂️Ім'я: {$fullName}
+✉️Telegram: @{$user->getUsername()}
+☎️Телефон: {$phone}
+🏙️Місто: {$user->getCity()->getName()}
 TEXT;
     }
 
