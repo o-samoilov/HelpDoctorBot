@@ -211,4 +211,48 @@ TEXT
     }
 
     // ########################################
+
+    /**
+     * @Route("/route/delete",  methods={"DELETE"})
+     *
+     * @param \App\Repository\RouteRepository $routeRepository
+     * @param \App\Repository\UserRepository  $userRepository
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function deleteAction(
+        \App\Repository\RouteRepository $routeRepository,
+        \App\Repository\UserRepository $userRepository
+    ): \Symfony\Component\HttpFoundation\JsonResponse {
+        $request = Request::createFromGlobals();
+        $data    = (array)json_decode($request->getContent(), true);
+
+        if (!isset($data['pipe_uid']) || !is_int($data['pipe_uid'])) {
+            return $this->createErrorResponse('Invalid key "pipe_uid".');
+        }
+
+        if (!isset($data['route_id']) || !is_int($data['route_id'])) {
+            return $this->createErrorResponse('Invalid key "pipe_uid".');
+        }
+
+        $user = $userRepository->findByPipeUid(($data['pipe_uid']));
+        if ($user === null) {
+            return $this->createErrorResponse('User not found');
+        }
+
+        $route = $routeRepository->find($data['route_id']);
+        if ($route === null) {
+            return $this->createErrorResponse('Route not found');
+        }
+
+        if ($route->getUser()->getId() !== $user->getId()) {
+            return $this->createErrorResponse('Route not register by current user');
+        }
+
+        return $this->json([
+            'status' => 'ok',
+        ]);
+    }
+
+    // ########################################
 }
