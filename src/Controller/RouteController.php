@@ -132,6 +132,8 @@ class RouteController extends BaseAbstract
         ]);
     }
 
+    // ########################################
+
     /**
      * @Route("/route/send",  methods={"POST"})
      *
@@ -188,8 +190,11 @@ class RouteController extends BaseAbstract
 
         $routes = array_slice($routes, $offset, self::SEND_LIMIT);
 
-
         foreach ($routes as $route) {
+            $status        = $route->isActive() ? 'Активний' : 'Неактивний';
+            $statusCommand = $route->isActive() ? "Деактивувати: /deactivate_route_{$route->getId()}" :
+                "Активувати: /activate_route_{$route->getId()}";
+
             $pipeSendMessage->setMessage(<<<TEXT
 ▶️Із району: {$route->getFromDistrict()->getName()}
 📋Комментарій: {$route->getFromComment()}
@@ -202,7 +207,10 @@ class RouteController extends BaseAbstract
 
 🙋‍♀️Кількість пасажирів: {$route->getPassengersCount()}
 
-Видалити маршрут: /delete_route_{$route->getId()}
+Статус: {$status}
+{$statusCommand}
+
+Видалити: /delete_route_{$route->getId()}
 TEXT
             );
 
@@ -212,6 +220,54 @@ TEXT
         return $this->json([
             'status' => 'ok',
             'offset' => $offset + self::SEND_LIMIT >= $routesCount ? 0 : $offset + self::SEND_LIMIT,
+        ]);
+    }
+
+    // ########################################
+
+    /**
+     * @Route("/route/update",  methods={"POST"})
+     *
+     * @param \App\Repository\RouteRepository $routeRepository
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function updateAction(
+        \App\Repository\RouteRepository $routeRepository
+    ): \Symfony\Component\HttpFoundation\JsonResponse {
+        $request = Request::createFromGlobals();
+        $data    = (array)json_decode($request->getContent(), true);
+
+        if (!isset($data['id']) || !is_int($data['id'])) {
+            return $this->createErrorResponse('Invalid key "id".');
+        }
+
+        $route = $routeRepository->find(($data['route_id']));
+        if ($route === null) {
+            return $this->createErrorResponse('Route not found');
+        }
+
+        $isNeedUpdate = false;
+
+        if (isset($data['status']) &&
+            is_int($data['status'])
+        ) {
+            $status = $data['status'];
+            if (!$route->isActive() && $status === 1) {
+                $route->markActive();
+                $isNeedUpdate = true;
+            }
+
+            if ($route->isActive() && $status === 0) {
+                $route->markActive();
+                $isNeedUpdate = true;
+            }
+        }
+
+        $isNeedUpdate && $routeRepository->save($route);
+
+        return $this->json([
+            'status' => 'ok',
         ]);
     }
 

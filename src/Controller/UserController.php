@@ -119,6 +119,97 @@ class UserController extends BaseAbstract
 
     // ########################################
 
+    // ########################################
+
+    /**
+     * @Route("/user/update", methods={"PUT"})
+     * @param \App\Repository\UserRepository $userRepository
+     * @param \App\Repository\CityRepository $cityRepository
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function updateAction(
+        \App\Repository\UserRepository $userRepository,
+        \App\Repository\CityRepository $cityRepository
+    ): \Symfony\Component\HttpFoundation\JsonResponse {
+        $request = Request::createFromGlobals();
+        $data    = (array)json_decode($request->getContent(), true);
+
+        if (!isset($data['pipe_uid']) || !is_int($data['pipe_uid'])) {
+            return $this->createErrorResponse('Invalid key "pipe_uid".');
+        }
+
+        $user = $userRepository->findByPipeUid($data['pipe_uid']);
+        if ($user === null) {
+            return $this->createErrorResponse('User not found.');
+        }
+
+        $isNeedUpdate = false;
+
+        if (isset($data['username']) &&
+            is_string($data['username']) &&
+            $user->getUsername() !== $data['username']
+        ) {
+            $user->setUsername($data['username']);
+            $isNeedUpdate = true;
+        }
+
+        if (isset($data['first_name']) &&
+            is_string($data['first_name']) &&
+            $user->getFirstName() !== $data['first_name']
+        ) {
+            $user->setFirstName($data['first_name']);
+            $isNeedUpdate = true;
+        }
+
+        if (isset($data['last_name']) &&
+            is_string($data['last_name']) &&
+            $user->getLastName() !== $data['last_name']
+        ) {
+            $user->setLastName($data['last_name']);
+            $isNeedUpdate = true;
+        }
+
+        if (isset($data['role']) &&
+            in_array($data['role'], [
+                \App\Entity\User::ROLE_DRIVER,
+                \App\Entity\User::ROLE_DOCTOR,
+            ]) &&
+            $user->getRole() !== $data['role']
+        ) {
+            $role = $data['role'];
+            if ($role === \App\Entity\User::ROLE_DRIVER) {
+                $user->markRoleDriver();
+            } else {
+                $user->markRoleDoctor();
+            }
+            $isNeedUpdate = true;
+        }
+
+        if (isset($data['city_id']) &&
+            is_int($data['city_id'])
+        ) {
+            $city = $cityRepository->find($data['city_id']);
+            if ($city === null) {
+                return $this->createErrorResponse('City not found.');
+            }
+
+            if ($user->getCity()->getId() !== $city->getId()) {
+                $user->setCity($city);
+                $isNeedUpdate = true;
+            }
+        }
+
+        $isNeedUpdate && $userRepository->save($user);
+
+        return $this->json([
+            'status' => 'ok',
+            'data'   => $this->userToArray($user),
+        ]);
+    }
+
+    // ########################################
+
     private function userToArray(\App\Entity\User $user): array
     {
         $fullName = $user->getFirstName();

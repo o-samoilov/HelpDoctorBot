@@ -46,6 +46,7 @@ class RouteRepository extends ServiceEntityRepository
     {
         $entityManager = $this->getEntityManager();
         $entityManager->remove($route);
+        $entityManager->flush();
     }
 
     // ########################################
