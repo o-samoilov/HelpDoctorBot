@@ -123,13 +123,16 @@ class UserController extends BaseAbstract
 
     /**
      * @Route("/user/update", methods={"PUT"})
-     * @param \App\Repository\UserRepository $userRepository
-     * @param \App\Repository\CityRepository $cityRepository
+     *
+     * @param \App\Repository\UserRepository  $userRepository
+     * @param \App\Repository\RouteRepository $routeRepository
+     * @param \App\Repository\CityRepository  $cityRepository
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function updateAction(
         \App\Repository\UserRepository $userRepository,
+        \App\Repository\RouteRepository $routeRepository,
         \App\Repository\CityRepository $cityRepository
     ): \Symfony\Component\HttpFoundation\JsonResponse {
         $request = Request::createFromGlobals();
@@ -177,10 +180,16 @@ class UserController extends BaseAbstract
             ]) &&
             $user->getRole() !== $data['role']
         ) {
-            $role = $data['role'];
-            if ($role === \App\Entity\User::ROLE_DRIVER) {
+            $newRole = (int)$data['role'];
+            if ($newRole === \App\Entity\User::ROLE_DRIVER) {
                 $user->markRoleDriver();
             } else {
+                $routes = $routeRepository->findByUser($user);
+                foreach ($routes as $route) {
+                    $route->markInactive();
+                    $routeRepository->save($route);
+                }
+
                 $user->markRoleDoctor();
             }
             $isNeedUpdate = true;
@@ -198,6 +207,14 @@ class UserController extends BaseAbstract
                 $user->setCity($city);
                 $isNeedUpdate = true;
             }
+        }
+
+        if (isset($data['phone']) &&
+            is_string($data['phone']) &&
+            $user->getPhone() !== $data['phone']
+        ) {
+            $user->setPhone($data['phone']);
+            $isNeedUpdate = true;
         }
 
         $isNeedUpdate && $userRepository->save($user);
@@ -256,6 +273,7 @@ class UserController extends BaseAbstract
 
         $pipeSendMessage->setUid($user->getPipeUid())
                         ->setMessage($this->generateProfileText($user));
+
         $pipeSendMessage->process();
 
         return $this->json([

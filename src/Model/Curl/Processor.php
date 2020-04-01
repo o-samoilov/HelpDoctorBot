@@ -14,7 +14,7 @@ class Processor
 
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 5);
-        curl_setopt($handle, CURLOPT_TIMEOUT, 60);
+        curl_setopt($handle, CURLOPT_TIMEOUT, 15);
 
         $response = curl_exec($handle);
 
@@ -47,7 +47,7 @@ class Processor
 
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 5);
-        curl_setopt($handle, CURLOPT_TIMEOUT, 60);
+        curl_setopt($handle, CURLOPT_TIMEOUT, 15);
         curl_setopt($handle, CURLOPT_POST, true);
         curl_setopt($handle, CURLOPT_POSTFIELDS, json_encode($data));
         curl_setopt($handle, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);

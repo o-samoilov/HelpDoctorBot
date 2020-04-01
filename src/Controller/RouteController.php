@@ -226,20 +226,31 @@ TEXT
     // ########################################
 
     /**
-     * @Route("/route/update",  methods={"POST"})
+     * @Route("/route/update",  methods={"PUT"})
      *
+     * @param \App\Repository\UserRepository  $userRepository
      * @param \App\Repository\RouteRepository $routeRepository
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function updateAction(
+        \App\Repository\UserRepository $userRepository,
         \App\Repository\RouteRepository $routeRepository
     ): \Symfony\Component\HttpFoundation\JsonResponse {
         $request = Request::createFromGlobals();
         $data    = (array)json_decode($request->getContent(), true);
 
-        if (!isset($data['id']) || !is_int($data['id'])) {
-            return $this->createErrorResponse('Invalid key "id".');
+        if (!isset($data['pipe_uid']) || !is_int($data['pipe_uid'])) {
+            return $this->createErrorResponse('Invalid key "pipe_uid".');
+        }
+
+        if (!isset($data['route_id']) || !is_int($data['route_id'])) {
+            return $this->createErrorResponse('Invalid key "route_id".');
+        }
+
+        $user = $userRepository->findByPipeUid(($data['pipe_uid']));
+        if ($user === null) {
+            return $this->createErrorResponse('User not found');
         }
 
         $route = $routeRepository->find(($data['route_id']));
@@ -247,19 +258,21 @@ TEXT
             return $this->createErrorResponse('Route not found');
         }
 
+        if ($route->getUser()->getId() !== $user->getId()) {
+            return $this->createErrorResponse('Route not register by current user');
+        }
+
         $isNeedUpdate = false;
 
-        if (isset($data['status']) &&
-            is_int($data['status'])
-        ) {
-            $status = $data['status'];
-            if (!$route->isActive() && $status === 1) {
+        if (isset($data['route_status'])) {
+            $newRouteStatus = (int)$data['route_status'];
+            if (!$route->isActive() && $newRouteStatus === 1) {
                 $route->markActive();
                 $isNeedUpdate = true;
             }
 
-            if ($route->isActive() && $status === 0) {
-                $route->markActive();
+            if ($route->isActive() && $newRouteStatus === 0) {
+                $route->markInactive();
                 $isNeedUpdate = true;
             }
         }

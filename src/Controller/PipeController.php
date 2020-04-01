@@ -44,9 +44,12 @@ class PipeController extends BaseAbstract
         $pipSetUserVar->setUid($user->getPipeUid());
         foreach ($response->getData() as $varName => $varValue) {
             if (strpos($varName, 'sys.') === false) {
-                $pipSetUserVar->setVarname($varName);
-                $pipSetUserVar->setVarvalue('null');
+                $pipSetUserVar->setVarname($varName)
+                              ->setVarvalue('null');
+
                 $pipSetUserVar->process();
+
+                break;
             }
         }
 
