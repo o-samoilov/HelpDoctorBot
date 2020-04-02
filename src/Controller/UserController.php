@@ -119,8 +119,6 @@ class UserController extends BaseAbstract
 
     // ########################################
 
-    // ########################################
-
     /**
      * @Route("/user/update", methods={"PUT"})
      *
@@ -210,10 +208,9 @@ class UserController extends BaseAbstract
         }
 
         if (isset($data['phone']) &&
-            is_string($data['phone']) &&
-            $user->getPhone() !== $data['phone']
+            $user->getPhone() !== (string)$data['phone']
         ) {
-            $user->setPhone($data['phone']);
+            $user->setPhone((string)$data['phone']);
             $isNeedUpdate = true;
         }
 
@@ -285,24 +282,27 @@ class UserController extends BaseAbstract
 
     private function generateProfileText(\App\Entity\User $user): string
     {
-        if ($user->isRoleDriver()) {
-            $roleText = 'Водій';
-        } else {
-            $roleText = 'Лікар/Працівник екстрених служб';
-        }
-
         $fullName = $user->getFirstName();
         if ($user->hasLastName()) {
             $fullName .= " {$user->getLastName()}";
         }
 
-        $phone = $user->hasPhone() ? $user->getPhone() : '-';
+        if ($user->isRoleDriver()) {
+            $phone = $user->hasPhone() ? $user->getPhone() : '-';
 
-        return <<<TEXT
-▶️Роль: {$roleText}
+            return <<<TEXT
+▶️Роль: Водій
 👱‍♂️Ім'я: {$fullName}
 ✉️Telegram: @{$user->getUsername()}
 ☎️Телефон: {$phone}
+🏙️Місто: {$user->getCity()->getName()}
+TEXT;
+        }
+
+        return <<<TEXT
+▶️Роль: Лікар/Працівник екстрених служб
+👱‍♂️Ім'я: {$fullName}
+✉️Telegram: @{$user->getUsername()}
 🏙️Місто: {$user->getCity()->getName()}
 TEXT;
     }

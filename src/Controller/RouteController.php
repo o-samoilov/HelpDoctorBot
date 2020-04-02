@@ -135,7 +135,7 @@ class RouteController extends BaseAbstract
     // ########################################
 
     /**
-     * @Route("/route/send",  methods={"POST"})
+     * @Route("/route/driver/send",  methods={"POST"})
      *
      * @param \App\Repository\RouteRepository     $routeRepository
      * @param \App\Repository\UserRepository      $userRepository
@@ -143,7 +143,7 @@ class RouteController extends BaseAbstract
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function sendAction(
+    public function sendDriverAction(
         \App\Repository\RouteRepository $routeRepository,
         \App\Repository\UserRepository $userRepository,
         \App\Model\Pipe\Command\SendMessage $pipeSendMessage
@@ -166,12 +166,16 @@ class RouteController extends BaseAbstract
             return $this->createErrorResponse('User not found');
         }
 
-        $routes      = $routeRepository->findByUser($user);
-        $routesCount = count($routes);
+        if (!$user->isRoleDriver()) {
+            return $this->createErrorResponse('Invalid user role');
+        }
+
+        $routes           = $routeRepository->findByUser($user);
+        $totalRoutesCount = count($routes);
 
         $pipeSendMessage->setUid($user->getPipeUid());
 
-        if ($routesCount === 0) {
+        if ($totalRoutesCount === 0) {
             $pipeSendMessage->setMessage('У вас немає маршрутів, додайте перший маршрут вже зараз!');
             $pipeSendMessage->process();
 
@@ -181,7 +185,7 @@ class RouteController extends BaseAbstract
             ]);
         }
 
-        if ($routesCount <= $offset) {
+        if ($totalRoutesCount <= $offset) {
             return $this->json([
                 'status' => 'ok',
                 'offset' => 0,
@@ -211,6 +215,122 @@ class RouteController extends BaseAbstract
 {$statusCommand}
 
 Видалити: /delete_route_{$route->getId()}
+TEXT
+            );
+
+            $pipeSendMessage->process();
+        }
+
+        return $this->json([
+            'status' => 'ok',
+            'offset' => $offset + self::SEND_LIMIT >= $totalRoutesCount ? 0 : $offset + self::SEND_LIMIT,
+        ]);
+    }
+
+    // ########################################
+
+    /**
+     * @Route("/route/doctor/send",  methods={"POST"})
+     *
+     * @param \App\Repository\RouteRepository     $routeRepository
+     * @param \App\Repository\UserRepository      $userRepository
+     * @param \App\Model\Pipe\Command\SendMessage $pipeSendMessage
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function sendDoctorAction(
+        \App\Repository\RouteRepository $routeRepository,
+        \App\Repository\UserRepository $userRepository,
+        \App\Model\Pipe\Command\SendMessage $pipeSendMessage
+    ): \Symfony\Component\HttpFoundation\JsonResponse {
+        $request = Request::createFromGlobals();
+        $data    = (array)json_decode($request->getContent(), true);
+
+        if (!isset($data['pipe_uid']) || !is_int($data['pipe_uid'])) {
+            return $this->createErrorResponse('Invalid key "pipe_uid".');
+        }
+
+        if (!isset($data['offset'])) {
+            return $this->createErrorResponse('Invalid key "offset".');
+        }
+
+        $offset = (int)$data['offset'];
+
+        $user = $userRepository->findByPipeUid(($data['pipe_uid']));
+        if ($user === null) {
+            return $this->createErrorResponse('User not found');
+        }
+
+        if (!$user->isRoleDoctor()) {
+            return $this->createErrorResponse('Invalid user role');
+        }
+
+        $queryBuilder = $routeRepository->createQueryBuilder('route')
+                                        ->where('route.isActive=true');
+
+        if (isset($data['district_from']) && is_int($data['district_from'])) {
+            $queryBuilder->where("fromDistrict={$data['district_from']}");
+        }
+
+        if (isset($data['district_to']) && is_int($data['district_to'])) {
+            $queryBuilder->where("toDistrict={$data['district_to']}");
+        }
+
+        $queryBuilder->select('COUNT(route.id) as count');
+        $routesCount = (int)$queryBuilder->getQuery()->getSingleScalarResult();
+
+        $pipeSendMessage->setUid($user->getPipeUid());
+
+        if ($routesCount === 0) {
+            $pipeSendMessage->setMessage('У вас немає маршрутів, додайте перший маршрут вже зараз!');
+            $pipeSendMessage->process();
+
+            return $this->json([
+                'status' => 'ok',
+                'offset' => 0,
+            ]);
+        }
+
+        if ($routesCount <= $offset) {
+            return $this->json([
+                'status' => 'ok',
+                'offset' => 0,
+            ]);
+        }
+
+        $queryBuilder->select('route')
+                     ->setFirstResult($offset)
+                     ->setMaxResults(self::SEND_LIMIT);
+
+        /** @var \App\Entity\Route[] $routes */
+        $routes = $queryBuilder->getQuery()->execute();
+
+        foreach ($routes as $route) {
+            $driver = $route->getUser();
+
+            $driverFullName = $driver->getFirstName();
+            if ($driver->hasLastName()) {
+                $driverFullName .= " {$driver->getLastName()}";
+            }
+
+            $driverPhone = $driver->hasPhone() ? $driver->getPhone() : '-';
+
+            $pipeSendMessage->setMessage(<<<TEXT
+▶️Із району: {$route->getFromDistrict()->getName()}
+📋Комментарій: {$route->getFromComment()}
+
+▶️До району: {$route->getToDistrict()->getName()}
+📋Комментарій: {$route->getToComment()}
+
+🕔Час: {$route->getTime()}
+📅Дата: {$route->getDate()}
+
+🙋‍♀️Кількість пасажирів: {$route->getPassengersCount()}
+
+Водій🚘
+👱‍♂️Ім'я: {$driverFullName}
+✉️Telegram: @{$driver->getUsername()}
+☎️Телефон: {$driverPhone}
 TEXT
             );
 
