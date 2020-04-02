@@ -241,7 +241,7 @@ class UserController extends BaseAbstract
             'username'   => $user->getUsername(),
             'full_name'  => $fullName,
             'first_name' => $user->getFirstName(),
-            'lastName'   => $user->getLastName(),
+            'last_name'  => $user->getLastName(),
             'phone'      => $user->getPhone(),
             'role'       => $user->getRole(),
             'city_id'    => $user->getCity()->getId(),
@@ -252,6 +252,7 @@ class UserController extends BaseAbstract
 
     /**
      * @Route("/user/sendProfile", methods={"POST"})
+     *
      * @param \App\Repository\UserRepository      $userRepository
      * @param \App\Model\Pipe\Command\SendMessage $pipeSendMessage
      *
