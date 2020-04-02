@@ -266,14 +266,15 @@ TEXT
         }
 
         $queryBuilder = $routeRepository->createQueryBuilder('route')
-                                        ->where('route.isActive=true');
+                                        ->andWhere('route.isActive=true')
+                                        ->andWhere("route.city={$user->getCity()->getId()}");
 
         if (isset($data['district_from']) && is_int($data['district_from'])) {
-            $queryBuilder->where("fromDistrict={$data['district_from']}");
+            $queryBuilder->andWhere("route.fromDistrict={$data['district_from']}");
         }
 
         if (isset($data['district_to']) && is_int($data['district_to'])) {
-            $queryBuilder->where("toDistrict={$data['district_to']}");
+            $queryBuilder->andWhere("route.toDistrict={$data['district_to']}");
         }
 
         $queryBuilder->select('COUNT(route.id) as count');
@@ -282,7 +283,7 @@ TEXT
         $pipeSendMessage->setUid($user->getPipeUid());
 
         if ($routesCount === 0) {
-            $pipeSendMessage->setMessage('У вас немає маршрутів, додайте перший маршрут вже зараз!');
+            $pipeSendMessage->setMessage('Маршрутів не знайдено.');
             $pipeSendMessage->process();
 
             return $this->json([
@@ -316,6 +317,7 @@ TEXT
             $driverPhone = $driver->hasPhone() ? $driver->getPhone() : '-';
 
             $pipeSendMessage->setMessage(<<<TEXT
+Маршрут:
 ▶️Із району: {$route->getFromDistrict()->getName()}
 📋Комментарій: {$route->getFromComment()}
 
@@ -327,7 +329,7 @@ TEXT
 
 🙋‍♀️Кількість пасажирів: {$route->getPassengersCount()}
 
-Водій🚘
+Водій:
 👱‍♂️Ім'я: {$driverFullName}
 ✉️Telegram: @{$driver->getUsername()}
 ☎️Телефон: {$driverPhone}

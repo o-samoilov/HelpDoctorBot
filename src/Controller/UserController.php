@@ -202,6 +202,11 @@ class UserController extends BaseAbstract
             }
 
             if ($user->getCity()->getId() !== $city->getId()) {
+                $routes = $routeRepository->findByUser($user);
+                foreach ($routes as $route) {
+                    $routeRepository->delete($route);
+                }
+
                 $user->setCity($city);
                 $isNeedUpdate = true;
             }
