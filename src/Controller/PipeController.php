@@ -48,8 +48,6 @@ class PipeController extends BaseAbstract
                               ->setVarvalue('null');
 
                 $pipSetUserVar->process();
-
-                break;
             }
         }
 
